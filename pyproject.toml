@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nba-edge"
+version = "0.1.0"
+description = "Power ratings, win probability, and Kelly sizing primitives for NBA-style moneylines"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Ian Alloway" }]
+keywords = ["nba", "sports-analytics", "kelly-criterion", "ratings"]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.3"]
+
+[project.urls]
+Homepage = "https://github.com/ianalloway/nba-ratings"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nba_edge"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
