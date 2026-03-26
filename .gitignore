@@ -4,3 +4,14 @@ __pycache__/
 .ruff_cache/
 dist/
 *.egg-info/
+
+# Local secrets and machine-specific config
+.env
+.env.local
+.envrc
+.env.*
+!.env.example
+!.env.local.example
+!env.example
+*.pem
+*.key
