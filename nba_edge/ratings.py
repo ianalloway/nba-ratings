@@ -7,6 +7,8 @@ import math
 
 def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
     """P(home beats away) given rating_home - rating_away (Elo logistic)."""
+    if scale <= 0:
+        raise ValueError(f"scale must be positive, got {scale}")
     return 1.0 / (1.0 + math.pow(10.0, -rating_diff / scale))
 
 
@@ -24,6 +26,12 @@ def update_elo(
     scale: float = 400.0,
 ) -> tuple[float, float]:
     """Elo update after match; score_a in {0, 0.5, 1} for loss/draw/win."""
+    if score_a not in (0, 0.5, 1):
+        raise ValueError(f"score_a must be 0, 0.5, or 1, got {score_a}")
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+    if scale <= 0:
+        raise ValueError(f"scale must be positive, got {scale}")
     exp_a = logistic_win_prob(rating_a - rating_b, scale=scale)
     new_a = rating_a + k * (score_a - exp_a)
     new_b = rating_b + k * ((1 - score_a) - (1 - exp_a))
