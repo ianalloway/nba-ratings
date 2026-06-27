@@ -20,7 +20,7 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 
 ## What It Includes
 
-- Elo updates
+- Elo updates, including a margin-of-victory-weighted variant
 - logistic win probability
 - Kelly fraction sizing
 - American odds to implied probability
@@ -39,6 +39,19 @@ from nba_edge import logistic_win_prob, update_elo, kelly_fraction, american_to_
 p = logistic_win_prob(rating_diff=120)
 new_h, new_a = update_elo(1600, 1580, 1.0)
 stake = kelly_fraction(p, -110, fraction=0.25)
+```
+
+### Margin-of-victory Elo
+
+Plain Elo treats every win the same, but a 30-point blowout is a stronger
+signal than a 2-point nail-biter. `update_elo_with_margin` applies a
+FiveThirtyEight-style multiplier so ratings move further on lopsided games
+and less when a team that was already heavily favored piles on:
+
+```python
+from nba_edge import update_elo_with_margin
+
+new_h, new_a = update_elo_with_margin(1600, 1580, 1.0, margin=22)
 ```
 
 ## Publish
