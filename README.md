@@ -21,9 +21,10 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 ## What It Includes
 
 - Elo updates, including a margin-of-victory-weighted variant
-- logistic win probability
+- Logistic win probability
 - Kelly fraction sizing
-- American odds to implied probability
+- Bidirectional odds format conversions (American, Decimal, Implied Probability)
+- Model evaluation metrics (Brier Score, Log Loss)
 
 ## Install
 
@@ -34,11 +35,32 @@ pip install nba-edge
 ## Example
 
 ```python
-from nba_edge import logistic_win_prob, update_elo, kelly_fraction, american_to_implied_prob
+from nba_edge import (
+    logistic_win_prob,
+    update_elo,
+    kelly_fraction,
+    american_to_decimal,
+    american_to_implied_prob,
+    brier_score,
+    log_loss,
+)
 
+# 1. Ratings & win probability
 p = logistic_win_prob(rating_diff=120)
 new_h, new_a = update_elo(1600, 1580, 1.0)
+
+# 2. Odds conversions
+dec = american_to_decimal(-110)      # Convert American to Decimal
+p_implied = american_to_implied_prob(-110)  # Convert American to Implied Probability
+
+# 3. Bet sizing
 stake = kelly_fraction(p, -110, fraction=0.25)
+
+# 4. Model evaluation
+predictions = [0.75, 0.40, 0.65]
+outcomes = [1.0, 0.0, 1.0]
+bs = brier_score(predictions, outcomes)
+ll = log_loss(predictions, outcomes)
 ```
 
 ### Margin-of-victory Elo
