@@ -64,3 +64,19 @@ def test_update_elo_with_margin_draw_uses_no_multiplier() -> None:
 def test_update_elo_with_margin_rejects_negative_margin() -> None:
     with pytest.raises(ValueError):
         update_elo_with_margin(1500.0, 1500.0, 1.0, margin=-5.0)
+
+
+def test_mov_multiplier_large_underdog_win_stays_positive() -> None:
+    # When elo_diff_winner < -2200 the raw denominator goes non-positive.
+    # The clamp must keep the multiplier finite and positive.
+    result = mov_multiplier(10.0, elo_diff_winner=-3000.0)
+    assert result > 0
+
+
+def test_mov_multiplier_denominator_boundary() -> None:
+    # Denominator boundary: elo_diff_winner = -2200 gives raw denom = 0, which
+    # collapses to the clamp floor. Results on both sides must be finite.
+    just_above = mov_multiplier(10.0, elo_diff_winner=-2199.0)
+    just_below = mov_multiplier(10.0, elo_diff_winner=-2201.0)
+    assert just_above > 0
+    assert just_below > 0

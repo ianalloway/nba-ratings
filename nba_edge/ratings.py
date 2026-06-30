@@ -51,7 +51,8 @@ def mov_multiplier(margin: float, elo_diff_winner: float) -> float:
     """
     if margin < 0:
         raise ValueError(f"margin must be non-negative, got {margin}")
-    return math.log(margin + 1) * (2.2 / (0.001 * elo_diff_winner + 2.2))
+    denom = max(0.001 * elo_diff_winner + 2.2, 0.001)
+    return math.log(margin + 1) * (2.2 / denom)
 
 
 def update_elo_with_margin(
