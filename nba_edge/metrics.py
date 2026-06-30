@@ -33,7 +33,9 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
         outs = [float(o) for o in outcomes]
 
     if len(preds) != len(outs):
-        raise ValueError(f"Lengths of predictions ({len(preds)}) and outcomes ({len(outs)}) must match")
+        raise ValueError(
+            f"Lengths of predictions ({len(preds)}) and outcomes ({len(outs)}) must match"
+        )
 
     if not preds:
         raise ValueError("Predictions and outcomes lists cannot be empty")
@@ -49,7 +51,9 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
     return total_se / len(preds)
 
 
-def log_loss(predictions: float | Iterable[float], outcomes: float | Iterable[float], eps: float = 1e-15) -> float:
+def log_loss(
+    predictions: float | Iterable[float], outcomes: float | Iterable[float], eps: float = 1e-15
+) -> float:
     """Calculate binary cross-entropy (log loss) for probability forecasts.
 
     Log loss penalizes highly confident incorrect predictions:
@@ -75,7 +79,9 @@ def log_loss(predictions: float | Iterable[float], outcomes: float | Iterable[fl
         outs = [float(o) for o in outcomes]
 
     if len(preds) != len(outs):
-        raise ValueError(f"Lengths of predictions ({len(preds)}) and outcomes ({len(outs)}) must match")
+        raise ValueError(
+            f"Lengths of predictions ({len(preds)}) and outcomes ({len(outs)}) must match"
+        )
 
     if not preds:
         raise ValueError("Predictions and outcomes lists cannot be empty")

@@ -22,8 +22,9 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 
 - Elo updates, including a margin-of-victory-weighted variant
 - Logistic win probability
-- Kelly fraction sizing
+- Kelly fraction sizing & multi-leg parlay sizing
 - Bidirectional odds format conversions (American, Decimal, Implied Probability)
+- Bookmaker vig-removal tools (Proportional and Equal Margin methods)
 - Model evaluation metrics (Brier Score, Log Loss)
 
 ## Install
@@ -41,6 +42,9 @@ from nba_edge import (
     kelly_fraction,
     american_to_decimal,
     american_to_implied_prob,
+    remove_vig,
+    parlay_odds,
+    kelly_parlay,
     brier_score,
     log_loss,
 )
@@ -49,12 +53,17 @@ from nba_edge import (
 p = logistic_win_prob(rating_diff=120)
 new_h, new_a = update_elo(1600, 1580, 1.0)
 
-# 2. Odds conversions
+# 2. Odds conversions & Vig Removal
 dec = american_to_decimal(-110)      # Convert American to Decimal
 p_implied = american_to_implied_prob(-110)  # Convert American to Implied Probability
+p_fair_h, p_fair_a = remove_vig(-110, -110, method="proportional")  # Remove vig
 
-# 3. Bet sizing
+# 3. Bet sizing & Parlays
 stake = kelly_fraction(p, -110, fraction=0.25)
+# Compute combined parlay odds/joint probability for independent legs
+parlay = parlay_odds([-110, +130])
+# Parlay Kelly sizing (fraction = 0.25 for quarter-Kelly)
+parlay_stake = kelly_parlay([0.60, 0.55], [-110, +130], fraction=0.25)
 
 # 4. Model evaluation
 predictions = [0.75, 0.40, 0.65]
