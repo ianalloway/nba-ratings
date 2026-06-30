@@ -8,6 +8,9 @@ from nba_edge.kelly import (
     implied_prob_to_american,
     implied_prob_to_decimal,
     kelly_fraction,
+    kelly_parlay,
+    parlay_odds,
+    remove_vig,
 )
 from nba_edge.metrics import brier_score, log_loss
 from nba_edge.ratings import (
@@ -26,6 +29,9 @@ __all__ = [
     "implied_prob_to_american",
     "implied_prob_to_decimal",
     "kelly_fraction",
+    "kelly_parlay",
+    "parlay_odds",
+    "remove_vig",
     "brier_score",
     "log_loss",
     "expected_margin",
