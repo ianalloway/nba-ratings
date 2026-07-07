@@ -181,3 +181,48 @@ def test_kelly_parlay() -> None:
     # Empty inputs
     with pytest.raises(ValueError):
         kelly_parlay([], [])
+
+
+def test_kelly_fraction_max_cap_upper_bound_validation() -> None:
+    # max_cap above 1.0 must be rejected
+    with pytest.raises(ValueError):
+        kelly_fraction(0.6, 100, max_cap=1.5)
+    with pytest.raises(ValueError):
+        kelly_fraction(0.6, 100, max_cap=2.0)
+
+
+def test_kelly_fraction_uncapped_exceeds_default_cap() -> None:
+    # With max_cap=None a strong edge yields a larger fraction than the default cap
+    capped = kelly_fraction(0.99, 1000, fraction=1.0, max_cap=0.25)
+    uncapped = kelly_fraction(0.99, 1000, fraction=1.0, max_cap=None)
+    assert uncapped > capped
+    assert uncapped < 1.0  # single-bet Kelly fraction is always below 1.0 bankroll
+
+
+def test_american_decimal_round_trip() -> None:
+    # american -> decimal -> american is an identity for both favorites and dogs
+    for am in (-110, -250, +150, +500, 100, 200):
+        dec = american_to_decimal(am)
+        back = decimal_to_american(dec)
+        assert pytest.approx(back, rel=1e-9) == am
+
+
+def test_decimal_implied_round_trip() -> None:
+    # decimal -> implied -> decimal is an identity for valid decimal odds
+    for dec in (1.5, 1.91, 2.0, 3.0, 6.0):
+        prob = decimal_to_implied_prob(dec)
+        back = implied_prob_to_decimal(prob)
+        assert pytest.approx(back, rel=1e-9) == dec
+
+
+def test_implied_american_round_trip() -> None:
+    # implied -> american -> implied is an identity for probs strictly below 0.5 and above
+    for prob in (0.1, 0.25, 0.4, 0.6, 0.75, 0.9):
+        am = implied_prob_to_american(prob)
+        back = american_to_implied_prob(am)
+        assert pytest.approx(back, rel=1e-9) == prob
+
+
+def test_implied_prob_to_decimal_accepts_unit() -> None:
+    # Upper bound is inclusive (1.0 -> 1.0), unlike implied_prob_to_american (strict < 1.0)
+    assert pytest.approx(implied_prob_to_decimal(1.0)) == 1.0
