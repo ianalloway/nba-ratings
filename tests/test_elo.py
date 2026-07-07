@@ -2,6 +2,7 @@ import pytest
 
 from nba_edge.ratings import (
     logistic_win_prob,
+    expected_margin,
     mov_multiplier,
     update_elo,
     update_elo_with_margin,
@@ -64,3 +65,23 @@ def test_update_elo_with_margin_draw_uses_no_multiplier() -> None:
 def test_update_elo_with_margin_rejects_negative_margin() -> None:
     with pytest.raises(ValueError):
         update_elo_with_margin(1500.0, 1500.0, 1.0, margin=-5.0)
+
+def test_expected_margin_proportional_to_rating_diff() -> None:
+    # Default slope: 100 Elo -> 2.5 points
+    assert pytest.approx(expected_margin(100.0)) == 2.5
+    assert pytest.approx(expected_margin(0.0)) == 0.0
+    # Linear and symmetric: favorite margin == -underdog margin
+    assert pytest.approx(expected_margin(200.0)) == 2 * expected_margin(100.0)
+    assert pytest.approx(expected_margin(-100.0)) == -expected_margin(100.0)
+
+
+def test_expected_margin_custom_slope() -> None:
+    # Override the per-Elo slope
+    assert pytest.approx(expected_margin(100.0, margin_per_elo=0.04)) == 4.0
+
+
+def test_expected_margin_never_divides_by_zero() -> None:
+    # Default slope is a plain multiply; ensure no ZeroDivisionError path exists
+    # for a degenerate (zero) slope so callers can pass margin_per_elo=0 safely.
+    assert pytest.approx(expected_margin(150.0, margin_per_elo=0.0)) == 0.0
+
