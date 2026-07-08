@@ -35,6 +35,25 @@ def test_mov_multiplier_dampened_for_big_favorite() -> None:
     assert favorite_blowout < underdog_win
 
 
+
+
+def test_mov_multiplier_pole_is_finite_and_positive() -> None:
+    # The dampening factor 2.2 / (0.001 * elo_diff_winner + 2.2) has a pole at
+    # elo_diff_winner == -2200. It must not raise ZeroDivisionError and must stay
+    # strictly positive (a negative multiplier would flip the Elo update sign).
+    for diff in (-2199.0, -2200.0, -2201.0, -3000.0, -5000.0):
+        mult = mov_multiplier(10.0, elo_diff_winner=diff)
+        assert mult > 0.0
+
+
+def test_mov_multiplier_clamped_below_pole_is_finite() -> None:
+    # For extreme underdog wins (elo_diff_winner < -2200) the multiplier stays
+    # finite instead of diverging to +/-inf, so callers can't crash on big upsets.
+    mult = mov_multiplier(30.0, elo_diff_winner=-10000.0)
+    assert mult == mult  # not NaN
+    assert abs(mult) < 1e6
+
+
 def test_mov_multiplier_rejects_negative_margin() -> None:
     with pytest.raises(ValueError):
         mov_multiplier(-1.0, elo_diff_winner=0.0)
