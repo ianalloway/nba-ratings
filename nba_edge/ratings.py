@@ -51,7 +51,15 @@ def mov_multiplier(margin: float, elo_diff_winner: float) -> float:
     """
     if margin < 0:
         raise ValueError(f"margin must be non-negative, got {margin}")
-    return math.log(margin + 1) * (2.2 / (0.001 * elo_diff_winner + 2.2))
+
+    # The dampening factor 2.2 / (0.001 * elo_diff_winner + 2.2) has a pole at
+    # elo_diff_winner == -2200 (raw ZeroDivisionError) and goes negative for any
+    # more extreme underdog win, which would flip the sign of the Elo update.
+    # Clamp the denominator so the multiplier stays strictly positive and finite
+    # for every float input (behavior for elo_diff_winner > -2200 is unchanged).
+    denom = 0.001 * elo_diff_winner + 2.2
+    denom = max(denom, 1e-3)
+    return math.log(margin + 1) * (2.2 / denom)
 
 
 def update_elo_with_margin(
