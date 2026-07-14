@@ -1,6 +1,6 @@
 import pytest
 import math
-from nba_edge.metrics import brier_score, log_loss
+from nba_edge.metrics import brier_score, calibration_curve, log_loss
 
 
 def test_brier_score_single() -> None:
@@ -69,3 +69,67 @@ def test_log_loss_invalid() -> None:
 
     with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
         log_loss(0.5, 0.5)
+
+def test_calibration_curve_basic_binning() -> None:
+    # Two predictions in 0.6-0.7 bin, one in 0.8-0.9 bin
+    preds = [0.65, 0.62, 0.85]
+    outs = [1.0, 0.0, 1.0]
+    curve = calibration_curve(preds, outs, bins=10)
+    # Only bins 6 and 8 are occupied
+    assert len(curve) == 2
+    b6, b8 = curve[0], curve[1]
+    assert b6["bin_low"] == pytest.approx(0.6)
+    assert b6["bin_high"] == pytest.approx(0.7)
+    assert b6["count"] == 2
+    assert b6["mean_predicted"] == pytest.approx(0.635)
+    assert b6["mean_actual"] == pytest.approx(0.5)
+    assert b8["count"] == 1
+    assert b8["mean_actual"] == pytest.approx(1.0)
+
+
+def test_calibration_curve_perfect_model() -> None:
+    # Predictions perfectly track actual rates — each bin maps to its midpoint
+    preds = [0.25, 0.25, 0.75, 0.75]
+    outs = [1.0, 0.0, 1.0, 1.0]
+    curve = calibration_curve(preds, outs, bins=4)
+    assert len(curve) == 2
+    low_bin = next(b for b in curve if b["bin_low"] == pytest.approx(0.25))
+    assert low_bin["mean_predicted"] == pytest.approx(0.25)
+
+
+def test_calibration_curve_p1_lands_in_last_bin() -> None:
+    curve = calibration_curve([1.0, 1.0], [1.0, 1.0], bins=10)
+    assert len(curve) == 1
+    assert curve[0]["bin_low"] == pytest.approx(0.9)
+    assert curve[0]["count"] == 2
+
+
+def test_calibration_curve_empty_bins_omitted() -> None:
+    # All predictions in one bin → only one entry returned
+    curve = calibration_curve([0.55, 0.58], [1.0, 0.0], bins=10)
+    assert len(curve) == 1
+
+
+def test_calibration_curve_single_bin() -> None:
+    curve = calibration_curve([0.3, 0.7], [0.0, 1.0], bins=1)
+    assert len(curve) == 1
+    assert curve[0]["bin_low"] == pytest.approx(0.0)
+    assert curve[0]["bin_high"] == pytest.approx(1.0)
+    assert curve[0]["count"] == 2
+
+
+def test_calibration_curve_validation() -> None:
+    with pytest.raises(ValueError, match="bins must be at least 1"):
+        calibration_curve([0.5], [1.0], bins=0)
+
+    with pytest.raises(ValueError, match="Lengths.*must match"):
+        calibration_curve([0.5, 0.6], [1.0])
+
+    with pytest.raises(ValueError, match="cannot be empty"):
+        calibration_curve([], [])
+
+    with pytest.raises(ValueError, match=r"in \[0, 1\]"):
+        calibration_curve([1.5], [1.0])
+
+    with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
+        calibration_curve([0.5], [0.5])
