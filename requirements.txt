@@ -1,1 +1,7 @@
+# This file exists only so Streamlit Community Cloud (which looks for a
+# root-level requirements.txt) can find the demo app's dependencies.
+#
+# The nba_edge library itself has zero runtime dependencies (see
+# pyproject.toml). To develop the library: pip install -e ".[dev]"
+# To run the demo locally: pip install -r demo/requirements.txt
 -r demo/requirements.txt

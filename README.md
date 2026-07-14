@@ -33,6 +33,11 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 pip install nba-edge
 ```
 
+The library has zero runtime dependencies (see `pyproject.toml`). The
+root-level `requirements.txt` is unrelated to the library — it only exists so
+Streamlit Community Cloud can find the demo app's dependencies
+(`demo/requirements.txt`, i.e. `streamlit` + `pandas`).
+
 ## Example
 
 ```python
