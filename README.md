@@ -30,7 +30,7 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 ## Install
 
 ```bash
-pip install -e .  # local; not yet on PyPI
+pip install nba-edge
 ```
 
 The library has zero runtime dependencies (see `pyproject.toml`). The
