@@ -282,3 +282,33 @@ def test_parlay_odds_internal_consistency() -> None:
         for o in legs:
             expected *= american_to_implied_prob(o)
         assert pytest.approx(res["implied_prob"]) == expected
+
+
+def test_remove_vig_conserves_total_probability() -> None:
+    # Both vig-removal methods must return fair probabilities that sum to
+    # exactly 1.0 and stay within the valid [0, 1] range, even on extreme
+    # (heavy-favorite vs heavy-favorite) markets that carry large overround.
+    # This guards against a regression where the additive 'equal' method could
+    # drift probabilities away from a valid distribution.
+    markets = [(-110, -110), (-150, 130), (-1000, -1000), (200, -250)]
+    for a, b in markets:
+        pa_prop, pb_prop = remove_vig(a, b, method="proportional")
+        pa_eq, pb_eq = remove_vig(a, b, method="equal")
+        assert pytest.approx(pa_prop + pb_prop) == 1.0
+        assert pytest.approx(pa_eq + pb_eq) == 1.0
+        assert 0.0 <= pa_prop <= 1.0 and 0.0 <= pb_prop <= 1.0
+        assert 0.0 <= pa_eq <= 1.0 and 0.0 <= pb_eq <= 1.0
+
+
+def test_remove_vig_zero_vig_market_is_identity() -> None:
+    # A market with no overround (+100 / -100 => implied 0.5 / 0.5) already
+    # holds fair probabilities; both methods must return them unchanged, and
+    # the additive 'equal' method must agree with 'proportional' when there is
+    # no vig to strip.
+    pa_prop, pb_prop = remove_vig(100, -100, method="proportional")
+    assert pytest.approx(pa_prop) == 0.5
+    assert pytest.approx(pb_prop) == 0.5
+
+    pa_eq, pb_eq = remove_vig(100, -100, method="equal")
+    assert pytest.approx(pa_eq) == pytest.approx(pa_prop)
+    assert pytest.approx(pb_eq) == pytest.approx(pb_prop)
