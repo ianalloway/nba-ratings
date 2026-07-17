@@ -226,3 +226,40 @@ def test_implied_american_round_trip() -> None:
 def test_implied_prob_to_decimal_accepts_unit() -> None:
     # Upper bound is inclusive (1.0 -> 1.0), unlike implied_prob_to_american (strict < 1.0)
     assert pytest.approx(implied_prob_to_decimal(1.0)) == 1.0
+
+
+def test_parlay_odds_internal_consistency() -> None:
+    """parlay_odds must keep its three returned quantities mutually consistent
+    and implied_prob must equal the product of the per-leg implied probs.
+
+    This locks invariants that the single hardcoded example in test_parlay_odds
+    does not cover across mixed favorites/underdogs and multi-leg parlays.
+    """
+    from nba_edge.kelly import (
+        american_to_implied_prob,
+        decimal_to_american,
+        decimal_to_implied_prob,
+    )
+
+    markets = [
+        [-110, -110],
+        [-110, +150],
+        [+200, -120, -110],
+        [-105, -105, -105, -105],
+        [+300, +400],
+        [-110, -110, -110, -110, -110],
+    ]
+    for legs in markets:
+        res = parlay_odds(legs)
+
+        # internal consistency: decimal <-> implied_prob
+        assert pytest.approx(res["implied_prob"]) == decimal_to_implied_prob(res["decimal"])
+
+        # american must round-trip back from the joint decimal
+        assert pytest.approx(res["american"]) == decimal_to_american(res["decimal"])
+
+        # implied_prob equals the product of per-leg implied probabilities
+        expected = 1.0
+        for o in legs:
+            expected *= american_to_implied_prob(o)
+        assert pytest.approx(res["implied_prob"]) == expected
