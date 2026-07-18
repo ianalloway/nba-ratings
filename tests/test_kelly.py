@@ -183,6 +183,25 @@ def test_kelly_parlay() -> None:
         kelly_parlay([], [])
 
 
+def test_kelly_parlay_returns_zero_on_losing_edge() -> None:
+    # A parlay must never size a negative fraction when the combined bet has no
+    # positive expected value. Break-even for two -110 legs is a joint win prob
+    # of ~0.2744; anything below that is a losing-edge parlay and must size to
+    # exactly 0.0 (not a negative "bet against").
+    assert pytest.approx(kelly_parlay([0.5, 0.5], [-110, -110], fraction=1.0)) == 0.0
+    # Clearly losing edge
+    assert pytest.approx(kelly_parlay([0.4, 0.5], [-110, -110], fraction=1.0)) == 0.0
+
+
+def test_kelly_parlay_never_negative() -> None:
+    # Sweep losing-edge parlays across favorites and dogs and assert the
+    # fraction is always clamped to >= 0 (the Kelly clamp, not a silent negative).
+    for wp in (0.1, 0.2, 0.3, 0.4, 0.5):
+        for odds in (-110, -150, 200, 300):
+            val = kelly_parlay([wp, wp], [odds, odds], fraction=1.0, max_cap=None)
+            assert val >= 0.0
+
+
 def test_kelly_fraction_max_cap_upper_bound_validation() -> None:
     # max_cap above 1.0 must be rejected
     with pytest.raises(ValueError):
