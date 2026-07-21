@@ -134,7 +134,8 @@ def calibration_curve(
 
         curve = calibration_curve([0.6, 0.7, 0.4, 0.55], [1.0, 1.0, 0.0, 1.0])
         # [{'bin_low': 0.4, 'bin_high': 0.5, 'mean_predicted': 0.4, 'mean_actual': 0.0, 'count': 1},
-        #  {'bin_low': 0.5, 'bin_high': 0.6, 'mean_predicted': 0.55, 'mean_actual': 1.0, 'count': 1},
+        #  {'bin_low': 0.5, 'bin_high': 0.6,
+        #   'mean_predicted': 0.55, 'mean_actual': 1.0, 'count': 1},
         #  {'bin_low': 0.6, 'bin_high': 0.7, 'mean_predicted': 0.6, 'mean_actual': 1.0, 'count': 1},
         #  {'bin_low': 0.7, 'bin_high': 0.8, 'mean_predicted': 0.7, 'mean_actual': 1.0, 'count': 1}]
     """
