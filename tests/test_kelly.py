@@ -149,6 +149,23 @@ def test_remove_vig() -> None:
     # But we can verify our validation checks gracefully.
 
 
+def test_parlay_odds_single_leg_is_identity() -> None:
+    """A single-leg parlay is the identity transformation: decimal, implied
+    probability, and American must all round-trip back to the input leg."""
+    from nba_edge.kelly import (
+        american_to_decimal,
+        american_to_implied_prob,
+        decimal_to_american,
+    )
+
+    leg = -110
+    res = parlay_odds([leg])
+    assert pytest.approx(res["decimal"]) == american_to_decimal(leg)
+    assert pytest.approx(res["implied_prob"]) == american_to_implied_prob(leg)
+    # No precision loss on a single element
+    assert pytest.approx(res["american"]) == float(leg)
+
+
 def test_parlay_odds() -> None:
     # 2 legs of -110 each
     # Decimal of -110 is 1.90909...
