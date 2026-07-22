@@ -155,7 +155,6 @@ def test_parlay_odds_single_leg_is_identity() -> None:
     from nba_edge.kelly import (
         american_to_decimal,
         american_to_implied_prob,
-        decimal_to_american,
     )
 
     leg = -110
