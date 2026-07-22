@@ -99,6 +99,17 @@ def test_logistic_win_prob_rejects_nonpositive_scale() -> None:
             logistic_win_prob(100.0, scale=scale)
 
 
+def test_logistic_win_prob_scale_changes_spread() -> None:
+    # Smaller scale exaggerates win-probability differences; larger scale
+    # flattens the curve toward 0.5.
+    diff = 100.0
+    narrow = logistic_win_prob(diff, scale=200.0)
+    wide = logistic_win_prob(diff, scale=400.0)
+    assert 0.5 < narrow < 1.0
+    assert 0.5 < wide < 1.0
+    assert narrow > wide  # smaller scale → stronger favorite signal
+
+
 def test_update_elo_zero_sum_conservation() -> None:
     cases = [
         (1500.0, 1500.0, 1.0),
