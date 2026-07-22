@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from nba_edge.ratings import (
@@ -100,3 +102,25 @@ def test_update_elo_with_margin_rejects_negative_margin() -> None:
 def test_update_elo_with_margin_rejects_invalid_score() -> None:
     with pytest.raises(ValueError, match="score_a must be 0, 0.5, or 1"):
         update_elo_with_margin(1500.0, 1450.0, 0.3, 10.0)
+
+
+def test_update_elo_with_margin_pole_underdog_conserves_mass() -> None:
+    # The MOV multiplier has a mathematical pole at elo_diff_winner == -2200
+    # that is guarded by a clamp inside mov_multiplier.  End-to-end, the
+    # update must not crash, must conserve rating mass, and the extreme
+    # underdog winner must receive a strictly positive rating gain.
+    base_a, base_b = 1400.0, 3600.0  # elo_diff_winner = -2200 exactly
+    a, b = update_elo_with_margin(base_a, base_b, 1.0, 30.0, k=20.0)
+    assert pytest.approx(a + b) == pytest.approx(base_a + base_b)
+    assert a > base_a  # underdog winner gains ratings
+    assert b < base_b  # favorite loser sheds ratings
+
+
+def test_update_elo_with_margin_beyond_pole_stays_stable() -> None:
+    # For elo_diff_winner well below the pole (-10 000), the clamp in
+    # mov_multiplier keeps the denominator at 1e-3 so the multiplier stays
+    # finite and the Elo update completes without crashing or returning nan/inf.
+    a, b = update_elo_with_margin(1400.0, 11400.0, 1.0, 30.0, k=20.0)
+    assert math.isfinite(a)
+    assert math.isfinite(b)
+    assert pytest.approx(a + b) == pytest.approx(1400.0 + 11400.0)
