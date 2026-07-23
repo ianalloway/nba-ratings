@@ -1,6 +1,14 @@
 import pytest
 import math
 from nba_edge.metrics import brier_score, calibration_curve, log_loss
+from nba_edge import CalibrationBin
+
+
+def test_calibration_bin_importable_from_package() -> None:
+    """CalibrationBin must be reachable from the top-level nba_edge namespace
+    so callers can annotate variables holding calibration_curve results."""
+    expected_keys = {"bin_low", "bin_high", "mean_predicted", "mean_actual", "count"}
+    assert set(CalibrationBin.__annotations__) == expected_keys
 
 
 def test_brier_score_single() -> None:

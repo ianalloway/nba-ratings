@@ -13,6 +13,7 @@ from nba_edge.kelly import (
     remove_vig,
 )
 from nba_edge.metrics import brier_score, calibration_curve, log_loss
+from nba_edge.metrics import CalibrationBin as CalibrationBin
 from nba_edge.ratings import (
     expected_margin,
     logistic_win_prob,
@@ -40,5 +41,6 @@ __all__ = [
     "mov_multiplier",
     "update_elo",
     "update_elo_with_margin",
+    "CalibrationBin",
 ]
 __version__ = "0.1.0"
