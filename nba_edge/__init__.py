@@ -12,8 +12,7 @@ from nba_edge.kelly import (
     parlay_odds,
     remove_vig,
 )
-from nba_edge.metrics import brier_score, calibration_curve, log_loss
-from nba_edge.metrics import CalibrationBin as CalibrationBin
+from nba_edge.metrics import CalibrationBin, brier_score, calibration_curve, log_loss
 from nba_edge.ratings import (
     expected_margin,
     logistic_win_prob,
@@ -23,24 +22,24 @@ from nba_edge.ratings import (
 )
 
 __all__ = [
+    "CalibrationBin",
     "american_to_decimal",
     "american_to_implied_prob",
+    "brier_score",
+    "calibration_curve",
     "decimal_to_american",
     "decimal_to_implied_prob",
+    "expected_margin",
     "implied_prob_to_american",
     "implied_prob_to_decimal",
     "kelly_fraction",
     "kelly_parlay",
-    "parlay_odds",
-    "remove_vig",
-    "brier_score",
-    "calibration_curve",
     "log_loss",
-    "expected_margin",
     "logistic_win_prob",
     "mov_multiplier",
+    "parlay_odds",
+    "remove_vig",
     "update_elo",
     "update_elo_with_margin",
-    "CalibrationBin",
 ]
 __version__ = "0.1.0"
