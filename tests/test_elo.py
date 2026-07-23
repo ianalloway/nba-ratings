@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from nba_edge.ratings import (
@@ -38,6 +40,14 @@ def test_mov_multiplier_dampened_for_big_favorite() -> None:
 def test_mov_multiplier_rejects_negative_margin() -> None:
     with pytest.raises(ValueError):
         mov_multiplier(-1.0, elo_diff_winner=0.0)
+
+
+def test_mov_multiplier_pole_at_neg2200_is_clamped() -> None:
+    # The denominator 0.001 * -2200 + 2.2 == 0.0 exactly; the clamp must
+    # prevent ZeroDivisionError and always return a strictly positive value.
+    val = mov_multiplier(10.0, elo_diff_winner=-2200.0)
+    assert val > 0.0
+    assert not math.isinf(val)
 
 
 def test_update_elo_with_margin_blowout_moves_more_than_narrow_win() -> None:

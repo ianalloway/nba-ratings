@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import math
 
+# Minimum value for the mov_multiplier denominator. Without this clamp the
+# formula has a pole at elo_diff_winner == -2200 (0.001 * -2200 + 2.2 == 0)
+# and would raise ZeroDivisionError for any more extreme underdog win.
+_MIN_MOV_DENOM: float = 1e-3
+
 
 def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
     """P(home beats away) given rating_home - rating_away (Elo logistic)."""
@@ -58,7 +63,7 @@ def mov_multiplier(margin: float, elo_diff_winner: float) -> float:
     # Clamp the denominator so the multiplier stays strictly positive and finite
     # for every float input (behavior for elo_diff_winner > -2200 is unchanged).
     denom = 0.001 * elo_diff_winner + 2.2
-    denom = max(denom, 1e-3)
+    denom = max(denom, _MIN_MOV_DENOM)
     return math.log(margin + 1) * (2.2 / denom)
 
 
