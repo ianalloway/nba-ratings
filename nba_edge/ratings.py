@@ -14,7 +14,11 @@ def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
     """P(home beats away) given rating_home - rating_away (Elo logistic)."""
     if scale <= 0:
         raise ValueError(f"scale must be positive, got {scale}")
-    return 1.0 / (1.0 + math.pow(10.0, -rating_diff / scale))
+    try:
+        return 1.0 / (1.0 + math.pow(10.0, -rating_diff / scale))
+    except OverflowError:
+        # Extreme underdog: 10^(large positive) overflows → probability ≈ 0
+        return 0.0 if rating_diff < 0 else 1.0
 
 
 def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:

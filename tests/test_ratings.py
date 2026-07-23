@@ -36,6 +36,14 @@ def test_logistic_win_prob_rejects_nonpositive_scale() -> None:
         logistic_win_prob(100.0, scale=-400.0)
 
 
+def test_logistic_win_prob_extreme_underdog_no_overflow() -> None:
+    # Very large negative diff used to raise OverflowError; now clamps to ~0.
+    assert logistic_win_prob(-1e10) == pytest.approx(0.0)
+    assert logistic_win_prob(-1e6) == pytest.approx(0.0, abs=1e-10)
+    # Very large positive diff still returns ~1.0 (no overflow on that branch).
+    assert logistic_win_prob(1e10) == pytest.approx(1.0)
+
+
 def test_update_elo_conserves_rating_mass() -> None:
     a, b = update_elo(1500.0, 1450.0, 1.0, k=32.0)
     assert (a + b) == pytest.approx(1500.0 + 1450.0)
