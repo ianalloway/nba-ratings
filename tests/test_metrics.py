@@ -1,7 +1,9 @@
-import pytest
 import math
-from nba_edge.metrics import brier_score, calibration_curve, log_loss
+
+import pytest
+
 from nba_edge import CalibrationBin
+from nba_edge.metrics import brier_score, calibration_curve, log_loss
 
 
 def test_calibration_bin_importable_from_package() -> None:

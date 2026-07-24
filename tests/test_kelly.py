@@ -1,4 +1,5 @@
 import pytest
+
 from nba_edge.kelly import (
     american_to_decimal,
     american_to_implied_prob,

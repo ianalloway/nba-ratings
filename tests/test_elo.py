@@ -3,8 +3,8 @@ import math
 import pytest
 
 from nba_edge.ratings import (
-    logistic_win_prob,
     expected_margin,
+    logistic_win_prob,
     mov_multiplier,
     update_elo,
     update_elo_with_margin,
