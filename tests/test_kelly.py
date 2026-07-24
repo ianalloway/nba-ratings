@@ -104,6 +104,21 @@ def test_kelly_fraction_calculation() -> None:
     assert pytest.approx(kelly_fraction(0.4, 100, fraction=1.0)) == 0.0
 
 
+def test_kelly_fraction_guaranteed_win_sizes_bankroll() -> None:
+    # win_prob=1.0 with positive odds is a risk-free bet: Kelly must return
+    # a positive, non-capped fraction (full edge, no clamps triggered).
+    assert kelly_fraction(1.0, 100, fraction=1.0) > 0.0
+
+    # With default cap: still positive, but bounded by 0.25
+    assert 0.0 < kelly_fraction(1.0, 100, fraction=1.0) <= 0.25
+
+    # Even with a fraction below the default cap, a guaranteed win must
+    # return strictly more than the same call at win_prob=0.9.
+    k_guaranteed = kelly_fraction(1.0, 100, fraction=0.25)
+    k_near_certain = kelly_fraction(0.9, 100, fraction=0.25)
+    assert k_guaranteed > k_near_certain
+
+
 def test_remove_vig() -> None:
     # Coexist in -110 / -110 market
     # Implied prob = 110/210 ≈ 0.5238 each, total ≈ 1.0476

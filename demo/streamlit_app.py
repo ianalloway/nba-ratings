@@ -4,6 +4,7 @@ Run locally:  streamlit run demo/streamlit_app.py
 Deployed on Streamlit Community Cloud; imports the real package from this repo.
 """
 
+import random
 import sys
 from pathlib import Path
 
@@ -96,7 +97,6 @@ with tab_kelly:
 # ---------------------------------------------------------------- season sim
 with tab_season:
     st.subheader("Elo convergence over a simulated season")
-    import random
 
     n_games = st.slider("Games per team", 20, 200, 82, step=2)
     seed = st.number_input("Random seed", 0, 9999, 42)
