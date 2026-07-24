@@ -132,46 +132,34 @@ def test_remove_vig() -> None:
     with pytest.raises(ValueError):
         remove_vig(-110, -110, method="invalid_method")
 
-    # If equal method results in negative probability (extreme case)
-    # e.g., one side has extremely low implied prob while the overround
-    # is huge.
-    # To trigger: A is +900 (p = 0.1), B is -105 (p = 0.5122) ->
-    # overround is negative (no vig) or let's construct high vig:
-    # Say overround is 0.3. Half overround = 0.15. If p_a = 0.1,
-    # fair_a would be -0.05.
-    # To construct: A is +1000 (implied = 100/1100 = 0.0909),
-    # B is -300 (implied = 300/400 = 0.75), C is somehow included
-    # or overround is huge:
-    # Let's say odds_a = 900 (p_a = 0.1), odds_b = -500
-    # (p_b = 5/6 ≈ 0.8333). Overround = 0.9333 - 1.0 = -0.0667
-    # (underround).
-    # What if odds_a = -110 (p_a = 0.5238), odds_b = -110
-    # (p_b = 0.5238), let's make vig massive:
-    # What if both are -500? p_a = p_b = 0.8333. Overround =
-    # 1.6667 - 1 = 0.6667. Overround/2 = 0.3333.
-    # This is fine. What if odds_a = 500 (p_a = 1/6 ≈ 0.1667),
-    # odds_b = -500 (p_b ≈ 0.8333). No vig.
-    # To make equal method produce negative: odds_a = 1000
-    # (p_a = 1/11 ≈ 0.0909), odds_b = -900 (p_b = 900/1000 = 0.9).
-    # Total = 0.9909. No vig.
-    # What if odds_a = 500 (p_a = 0.1667), odds_b = -250
-    # (p_b = 250/350 = 0.714). Total = 0.88.
-    # What if we have a massive vig: say we have a custom constructed
-    # pair where overround/2 is greater than one of the implied probs.
-    # If odds_a = 800 (p_a = 0.1111), odds_b = -1000
-    # (p_b = 1000/1100 = 0.909). Total = 1.02. Half overround =
-    # 0.01. Fair = 0.10.
-    # What if odds_a = 1000 (p_a = 0.0909), odds_b = -2000
-    # (p_b = 2000/2100 = 0.952). Total = 1.043. Half overround =
-    # 0.0215. Fair_a = 0.0694.
-    # Let's try: odds_a = 1000 (p_a ≈ 0.0909), odds_b = -10000
-    # (p_b ≈ 0.9901). Total = 1.081. Half overround = 0.0405.
-    # Fair_a = 0.0504.
-    # It is hard to get negative since a blowout favorite means the
-    # underdog is long odds, but they both can't be long odds and have
-    # huge overround unless they are both priced as favorites, which
-    # is mathematically weird.
-    # But we can verify our validation checks gracefully.
+
+def test_remove_vig_equal_never_yields_negative_probability() -> None:
+    """The additive equal-method subtracts half the overround from each
+    implied probability. With valid American odds both implieds lie in
+    (0, 1), so the overround is at most just under 2.0 and each fair
+    probability is bounded below by a tiny positive number. Sweep a wide
+    range of valid inputs to confirm no probability ever goes negative
+    and both methods always sum to exactly 1.0.
+    """
+    candidates = [
+        (-10001, -100),
+        (1000, -1000),
+        (10000, 10000),
+        (-500, 500),
+        (200, -250),
+        (-1100, 1100),
+        (5000, -5000),
+        (+150, -110),
+    ]
+    for a, b in candidates:
+        pa_prop, pb_prop = remove_vig(a, b, method="proportional")
+        pa_eq, pb_eq = remove_vig(a, b, method="equal")
+        assert 0.0 <= pa_prop <= 1.0
+        assert 0.0 <= pb_prop <= 1.0
+        assert 0.0 <= pa_eq <= 1.0
+        assert 0.0 <= pb_eq <= 1.0
+        assert pa_prop + pb_prop == pytest.approx(1.0)
+        assert pa_eq + pb_eq == pytest.approx(1.0)
 
 
 def test_parlay_odds_single_leg_is_identity() -> None:
