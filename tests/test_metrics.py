@@ -78,6 +78,19 @@ def test_log_loss_invalid() -> None:
     with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
         log_loss(0.5, 0.5)
 
+def test_log_loss_eps_clipping_at_boundaries() -> None:
+    # log_loss clips predictions into [eps, 1-eps] before taking the log so
+    # boundary values p=0.0 and p=1.0 do not raise log(0). Default eps is 1e-15.
+    assert log_loss(1.0, 1.0) == pytest.approx(0.0, abs=1e-12)
+    assert log_loss(0.0, 0.0) == pytest.approx(0.0, abs=1e-12)
+
+    # A wider eps changes the clipping threshold: p=1.0 is clipped to 1-eps,
+    # so a larger eps produces a slightly larger (but still tiny) penalty.
+    default_eps = log_loss(1.0, 1.0)
+    wider_eps = log_loss(1.0, 1.0, eps=1e-6)
+    assert wider_eps > default_eps
+
+
 def test_calibration_curve_basic_binning() -> None:
     # Two predictions in 0.6-0.7 bin, one in 0.8-0.9 bin
     preds = [0.65, 0.62, 0.85]
