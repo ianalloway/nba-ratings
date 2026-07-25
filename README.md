@@ -1,6 +1,6 @@
-# nba-edge
+# nba-ratings
 
-> Repo: `nba-ratings` · Package: `nba-edge`
+> Published to PyPI as [`nba-edge`](https://pypi.org/project/nba-edge/).
 
 [![CI](https://github.com/ianalloway/nba-ratings/actions/workflows/ci.yml/badge.svg)](https://github.com/ianalloway/nba-ratings/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
