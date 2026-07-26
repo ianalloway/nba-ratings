@@ -228,6 +228,27 @@ def test_kelly_parlay() -> None:
         kelly_parlay([], [])
 
 
+def test_kelly_parlay_single_leg_matches_kelly_fraction() -> None:
+    """A single-leg parlay is the identity function for kelly_fraction
+    with identical win_prob, american_odds, fraction, and max_cap.
+
+    This guards the mathematical invariant that adding trivial parlay
+    machinery to a single bet must not change the sizing recommendation.
+    """
+    # Uncapped single leg
+    assert pytest.approx(
+        kelly_parlay([0.6], [100], fraction=0.25, max_cap=None)
+    ) == kelly_fraction(0.6, 100, fraction=0.25, max_cap=None)
+    # Default cap (0.25) still matches
+    assert pytest.approx(
+        kelly_parlay([0.6], [100], fraction=0.25)
+    ) == kelly_fraction(0.6, 100, fraction=0.25)
+    # Capped single leg: large edge hits the 0.25 cap
+    assert pytest.approx(
+        kelly_parlay([0.99], [1000], fraction=1.0, max_cap=0.25)
+    ) == kelly_fraction(0.99, 1000, fraction=1.0, max_cap=0.25)
+
+
 def test_kelly_parlay_returns_zero_on_losing_edge() -> None:
     # A parlay must never size a negative fraction when the combined bet has no
     # positive expected value. Break-even for two -110 legs is a joint win prob
