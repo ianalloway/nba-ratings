@@ -20,7 +20,8 @@ demo = ["streamlit>=1.60.0", "pandas>=2.3.3"]
 
 [project.urls]
 Homepage = "https://github.com/ianalloway/nba-ratings"
-
+Repository = "https://github.com/ianalloway/nba-ratings"
+Bug-Tracker = "https://github.com/ianalloway/nba-ratings/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["nba_edge"]
 
