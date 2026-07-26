@@ -384,3 +384,33 @@ def test_remove_vig_zero_vig_market_is_identity() -> None:
     pa_eq, pb_eq = remove_vig(100, -100, method="equal")
     assert pytest.approx(pa_eq) == pytest.approx(pa_prop)
     assert pytest.approx(pb_eq) == pytest.approx(pb_prop)
+
+
+def test_kelly_parlay_validates_win_prob_bounds() -> None:
+    # win_probs outside [0, 1] must be rejected (guards against silent
+    # negative-edge or >100% probability inputs corrupting the sizing).
+    with pytest.raises(ValueError):
+        kelly_parlay([1.5], [-110])
+    with pytest.raises(ValueError):
+        kelly_parlay([-0.1, 0.6], [-110, -110])
+
+    # Valid boundary probabilities must be accepted without error.
+    assert kelly_parlay([0.0, 0.5], [-110, -110], fraction=1.0) >= 0.0
+    assert kelly_parlay([1.0, 1.0], [-110, -110], fraction=1.0) >= 0.0
+
+
+def test_kelly_parlay_rejects_invalid_american_odds() -> None:
+    # Odds in the forbidden -100..100 band must surface as ValueError, the
+    # same guard used by the single-leg converters (parlay must not swallow it).
+    with pytest.raises(ValueError):
+        kelly_parlay([0.6], [50])
+    with pytest.raises(ValueError):
+        kelly_parlay([0.6, 0.7], [-110, 50])
+
+
+def test_parlay_odds_rejects_invalid_leg_odds() -> None:
+    # A single invalid leg must raise rather than produce a NaN/garbage combo.
+    with pytest.raises(ValueError):
+        parlay_odds([50])
+    with pytest.raises(ValueError):
+        parlay_odds([-110, 50, -110])
