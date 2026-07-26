@@ -53,6 +53,8 @@ def test_decimal_to_implied_prob() -> None:
 
     with pytest.raises(ValueError):
         decimal_to_implied_prob(0.9)
+    with pytest.raises(ValueError):
+        decimal_to_implied_prob(1.0)
 
 
 def test_implied_prob_to_american() -> None:
@@ -61,6 +63,8 @@ def test_implied_prob_to_american() -> None:
 
     with pytest.raises(ValueError):
         implied_prob_to_american(0.0)
+    with pytest.raises(ValueError):
+        implied_prob_to_american(1.0)
     with pytest.raises(ValueError):
         implied_prob_to_american(1.5)
 
@@ -71,6 +75,8 @@ def test_implied_prob_to_decimal() -> None:
 
     with pytest.raises(ValueError):
         implied_prob_to_decimal(-0.1)
+    with pytest.raises(ValueError):
+        implied_prob_to_decimal(0.0)
 
 
 def test_kelly_fraction_validation() -> None:
