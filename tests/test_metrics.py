@@ -93,6 +93,23 @@ def test_log_loss_eps_clipping_at_boundaries() -> None:
     assert wider_eps > default_eps
 
 
+def test_log_loss_boundary_wrong_prediction_clipped() -> None:
+    # Confident wrong predictions at p=0.0 and p=1.0 must stay finite
+    # (thanks to the [eps, 1-eps] clip inside log_loss). Each direction
+    # is tested independently because the float representation of 1-eps
+    # is not bitwise symmetric with eps, so the two paths land on
+    # slightly different but equally valid finite values.
+    for p, o in ((1.0, 0.0), (0.0, 1.0)):
+        val = log_loss(p, o)
+        assert math.isfinite(val)
+        assert val > 10.0  # strongly penalized, not a no-op
+
+    # A wider eps makes the penalty slightly smaller than the default.
+    default_wrong = log_loss(1.0, 0.0)
+    wider_wrong = log_loss(1.0, 0.0, eps=1e-6)
+    assert wider_wrong < default_wrong
+
+
 def test_calibration_curve_basic_binning() -> None:
     # Two predictions in 0.6-0.7 bin, one in 0.8-0.9 bin
     preds = [0.65, 0.62, 0.85]
