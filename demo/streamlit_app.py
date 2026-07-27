@@ -1,4 +1,4 @@
-"""Interactive demo of the nba_edge package (Elo, win probability, Kelly).
+"""Interactive demo of the nba_edge package (Elo, win probability, Kelly).  # noqa: INP001
 
 Run locally:  streamlit run demo/streamlit_app.py
 Deployed on Streamlit Community Cloud; imports the real package from this repo.
@@ -27,11 +27,11 @@ st.set_page_config(page_title="nba-edge demo", page_icon="📈", layout="wide")
 st.title("📈 nba-edge — live demo")
 st.caption(
     "Every number on this page is computed by the real `nba_edge` package "
-    "([source](https://github.com/ianalloway/nba-ratings)) — not a re-implementation."
+    "([source](https://github.com/ianalloway/nba-ratings)) — not a re-implementation.",
 )
 
 tab_prob, tab_elo, tab_kelly, tab_season = st.tabs(
-    ["Win probability", "Elo update", "Kelly sizing", "Season simulation"]
+    ["Win probability", "Elo update", "Kelly sizing", "Season simulation"],
 )
 
 # ---------------------------------------------------------------- win prob
@@ -39,7 +39,7 @@ with tab_prob:
     st.subheader("Rating difference → win probability")
     col1, col2 = st.columns([1, 2])
     with col1:
-        diff = st.slider("Home Elo − Away Elo", -400, 400, 80, step=10)
+        diff = st.slider("Home Elo - Away Elo", -400, 400, 80, step=10)
         scale = st.select_slider("Logistic scale", [200, 300, 400, 500], value=400)
         p = logistic_win_prob(diff, scale=scale)
         st.metric("P(home wins)", f"{p:.1%}")
@@ -47,7 +47,7 @@ with tab_prob:
     with col2:
         xs = list(range(-400, 401, 10))
         curve = pd.DataFrame(
-            {"rating diff": xs, "P(home wins)": [logistic_win_prob(x, scale=scale) for x in xs]}
+            {"rating diff": xs, "P(home wins)": [logistic_win_prob(x, scale=scale) for x in xs]},
         ).set_index("rating diff")
         st.line_chart(curve, height=320)
     st.caption("`logistic_win_prob(diff, scale)` — the classic Elo logistic curve.")
@@ -67,8 +67,8 @@ with tab_elo:
     c2.metric("New B rating", f"{new_b:.1f}", f"{new_b - rb:+.1f}")
     c3.metric("Pre-game P(A wins)", f"{pre:.1%}")
     st.caption(
-        "Upsets move ratings more: the update is K × (actual − expected). "
-        "`update_elo(ra, rb, score_a, k=K)`"
+        "Upsets move ratings more: the update is K x (actual - expected). "
+        "`update_elo(ra, rb, score_a, k=K)`",
     )
 
 # ---------------------------------------------------------------- kelly
@@ -91,7 +91,7 @@ with tab_kelly:
             st.info("No bet: the market price already exceeds your estimated probability.")
         st.caption(
             "`kelly_fraction` caps stakes at 25% of bankroll and returns 0 on negative edge — "
-            "guardrails matter more than the formula."
+            "guardrails matter more than the formula.",
         )
 
 # ---------------------------------------------------------------- season sim
@@ -120,11 +120,11 @@ with tab_season:
     st.line_chart(chart, height=360)
     st.caption(
         "Four teams start at 1500; games are simulated from hidden true strengths "
-        "(1650/1550/1450/1350). Watch `update_elo` recover the truth from results alone."
+        "(1650/1550/1450/1350). Watch `update_elo` recover the truth from results alone.",
     )
 
 st.divider()
 st.markdown(
     "Built from [`ianalloway/nba-ratings`](https://github.com/ianalloway/nba-ratings) · "
-    "part of the demo suite at [ianalloway.xyz/demos](https://ianalloway.xyz/demos)"
+    "part of the demo suite at [ianalloway.xyz/demos](https://ianalloway.xyz/demos)",
 )
