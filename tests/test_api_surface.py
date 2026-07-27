@@ -5,6 +5,7 @@ the published package (the CLV dashboard, line-shop tooling, etc.). It is meant
 to fail loudly if a public symbol is renamed, dropped, or omitted from
 ``__all__``, or if ``__version__`` ever stops being a valid version string.
 """
+
 from __future__ import annotations
 
 import inspect

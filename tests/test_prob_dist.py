@@ -53,9 +53,7 @@ def test_parlay_implied_prob_equals_product_of_legs() -> None:
         res = parlay_odds(list(legs))
         product = 1.0
         for odds in legs:
-            product *= (
-                100.0 / (odds + 100.0) if odds > 0 else abs(odds) / (abs(odds) + 100.0)
-            )
+            product *= 100.0 / (odds + 100.0) if odds > 0 else abs(odds) / (abs(odds) + 100.0)
         assert res["implied_prob"] == pytest.approx(product)
 
 

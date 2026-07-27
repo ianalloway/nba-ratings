@@ -242,13 +242,13 @@ def test_kelly_parlay_single_leg_matches_kelly_fraction() -> None:
     machinery to a single bet must not change the sizing recommendation.
     """
     # Uncapped single leg
-    assert pytest.approx(
-        kelly_parlay([0.6], [100], fraction=0.25, max_cap=None)
-    ) == kelly_fraction(0.6, 100, fraction=0.25, max_cap=None)
+    assert pytest.approx(kelly_parlay([0.6], [100], fraction=0.25, max_cap=None)) == kelly_fraction(
+        0.6, 100, fraction=0.25, max_cap=None
+    )
     # Default cap (0.25) still matches
-    assert pytest.approx(
-        kelly_parlay([0.6], [100], fraction=0.25)
-    ) == kelly_fraction(0.6, 100, fraction=0.25)
+    assert pytest.approx(kelly_parlay([0.6], [100], fraction=0.25)) == kelly_fraction(
+        0.6, 100, fraction=0.25
+    )
     # Capped single leg: large edge hits the 0.25 cap
     assert pytest.approx(
         kelly_parlay([0.99], [1000], fraction=1.0, max_cap=0.25)

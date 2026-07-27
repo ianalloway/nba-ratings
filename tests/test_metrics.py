@@ -80,6 +80,7 @@ def test_log_loss_invalid() -> None:
     with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
         log_loss(0.5, 0.5)
 
+
 def test_log_loss_eps_clipping_at_boundaries() -> None:
     # log_loss clips predictions into [eps, 1-eps] before taking the log so
     # boundary values p=0.0 and p=1.0 do not raise log(0). Default eps is 1e-15.
