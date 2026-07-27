@@ -25,7 +25,7 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 - Kelly fraction sizing & multi-leg parlay sizing
 - Bidirectional odds format conversions (American, Decimal, Implied Probability)
 - Bookmaker vig-removal tools (Proportional and Equal Margin methods)
-- Model evaluation metrics (Brier Score, Log Loss)
+- Model evaluation metrics (Brier Score, Log Loss, Calibration Curve)
 
 ## Install
 
@@ -53,6 +53,7 @@ from nba_edge import (
     parlay_odds,
     kelly_parlay,
     brier_score,
+    calibration_curve,
     log_loss,
 )
 
@@ -79,6 +80,7 @@ predictions = [0.75, 0.40, 0.65]
 outcomes = [1.0, 0.0, 1.0]
 bs = brier_score(predictions, outcomes)
 ll = log_loss(predictions, outcomes)
+curve = calibration_curve(predictions, outcomes, bins=10)
 ```
 
 ### Margin-of-victory Elo
