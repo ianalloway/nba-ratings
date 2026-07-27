@@ -81,6 +81,23 @@ def test_expected_margin_proportional_to_rating_diff() -> None:
     assert pytest.approx(expected_margin(-100.0)) == -expected_margin(100.0)
 
 
+def test_expected_margin_sign_tied_to_rating_diff() -> None:
+    # The sign must flip when rating_diff flips sign; slope only controls
+    # magnitude.
+    assert expected_margin(100.0) == pytest.approx(-expected_margin(-100.0))
+    for diff in (150.0, 300.0, -75.0, -200.0):
+        assert expected_margin(diff) * diff >= 0  # sign agreement
+
+
+def test_expected_margin_margin_per_elo_linear() -> None:
+    # Doubling margin_per_elo doubles the result regardless of rating_diff.
+    base = expected_margin(120.0)
+    doubled = expected_margin(120.0, margin_per_elo=2 * 0.025)
+    assert pytest.approx(doubled) == 2 * base
+    # Zero slope collapses to 0 margin for any non-zero diff.
+    assert expected_margin(180.0, margin_per_elo=0.0) == pytest.approx(0.0)
+
+
 def test_expected_margin_custom_slope() -> None:
     assert pytest.approx(expected_margin(100.0, margin_per_elo=0.04)) == 4.0
 

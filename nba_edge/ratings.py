@@ -22,7 +22,22 @@ def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
 
 
 def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
-    """Toy mapping from Elo diff to predicted point margin (calibrate externally)."""
+    """Linear toy mapping from an Elo difference to a predicted point margin.
+
+    The default slope (0.025) maps a 40-point gap to a 1-point spread.
+    This is intentionally un-calibrated for real NBA scoring; callers
+    should pipe NBA-specific margin-per-Elo estimates into
+    ``margin_per_elo`` rather than trusting the built-in default.
+
+    Args:
+        rating_diff: ``rating_home − rating_away``. Positive → home favored.
+        margin_per_elo: Points of predicted margin per Elo point of difference.
+            A non-negative value keeps the sign tied to ``rating_diff``.
+            Zero collapses the mapping to 0 margin for any diff.
+
+    Returns:
+        Predicted point margin (positive = home favored, negative = away).
+    """
     return rating_diff * margin_per_elo
 
 
