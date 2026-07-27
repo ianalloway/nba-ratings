@@ -50,7 +50,7 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
         raise ValueError("Predictions and outcomes lists cannot be empty")
 
     total_se = 0.0
-    for p, o in zip(preds, outs):
+    for p, o in zip(preds, outs, strict=True):
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Predicted probability must be between 0 and 1, got {p}")
         if o not in (0.0, 1.0):
@@ -96,7 +96,7 @@ def log_loss(
         raise ValueError("Predictions and outcomes lists cannot be empty")
 
     total_loss = 0.0
-    for p, o in zip(preds, outs):
+    for p, o in zip(preds, outs, strict=True):
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Predicted probability must be between 0 and 1, got {p}")
         if o not in (0.0, 1.0):
@@ -163,7 +163,7 @@ def calibration_curve(
     # bucket[i] holds (sum_predicted, sum_actual, count) for bin i
     buckets: list[list[float]] = [[0.0, 0.0, 0.0] for _ in range(bins)]
 
-    for p, o in zip(preds, outs):
+    for p, o in zip(preds, outs, strict=True):
         # Edge case: p == 1.0 goes into the last bin
         idx = min(int(p / width), bins - 1)
         buckets[idx][0] += p
