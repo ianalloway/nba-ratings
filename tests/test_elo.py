@@ -106,6 +106,13 @@ def test_expected_margin_never_divides_by_zero() -> None:
     assert pytest.approx(expected_margin(150.0, margin_per_elo=0.0)) == 0.0
 
 
+def test_expected_margin_rejects_negative_slope() -> None:
+    # The docstring guarantees the sign is tied to rating_diff for non-negative
+    # slopes; a negative slope would silently flip the sign, so it must be rejected.
+    with pytest.raises(ValueError, match="margin_per_elo must be non-negative"):
+        expected_margin(100.0, margin_per_elo=-0.025)
+
+
 # --- Added coverage: symmetry, conservation, and input validation ---
 
 

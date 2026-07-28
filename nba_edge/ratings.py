@@ -38,6 +38,8 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
     Returns:
         Predicted point margin (positive = home favored, negative = away).
     """
+    if margin_per_elo < 0:
+        raise ValueError(f"margin_per_elo must be non-negative, got {margin_per_elo}")
     return rating_diff * margin_per_elo
 
 
