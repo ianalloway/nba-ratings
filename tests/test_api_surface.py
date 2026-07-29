@@ -49,3 +49,19 @@ def test_no_public_symbol_missing_from_all() -> None:
             continue
         if getattr(obj, "__module__", "").startswith("nba_edge"):
             assert name in expected, f"public symbol {name!r} is missing from __all__"
+
+
+def test_version_matches_pyproject_toml() -> None:
+    """__init__.py version must stay in sync with pyproject.toml so the
+    runtime-reported version and the packaging metadata never drift apart."""
+    import re
+    from pathlib import Path
+
+    pyproject = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    content = pyproject.read_text(encoding="utf-8")
+    m = re.search(r'(?m)^version\s*=\s*"([^"]+)"', content)
+    assert m is not None, "version field not found in pyproject.toml"
+    assert nba_edge.__version__ == m.group(1), (
+        f"nba_edge.__version__={nba_edge.__version__!r} != "
+        f"pyproject.toml version={m.group(1)!r}"
+    )
