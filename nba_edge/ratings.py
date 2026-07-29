@@ -60,9 +60,6 @@ def update_elo(
         raise ValueError(f"scale must be a positive finite number, got {scale}")
     if score_a not in (0, 0.5, 1):
         raise ValueError(f"score_a must be 0, 0.5, or 1, got {score_a}")
-        raise ValueError(f"k must be positive, got {k}")
-    if scale <= 0:
-        raise ValueError(f"scale must be positive, got {scale}")
     exp_a = logistic_win_prob(rating_a - rating_b, scale=scale)
     new_a = rating_a + k * (score_a - exp_a)
     new_b = rating_b + k * ((1 - score_a) - (1 - exp_a))
