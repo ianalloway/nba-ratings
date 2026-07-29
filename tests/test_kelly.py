@@ -110,6 +110,14 @@ def test_kelly_fraction_calculation() -> None:
     assert pytest.approx(kelly_fraction(0.4, 100, fraction=1.0)) == 0.0
 
 
+def test_kelly_fraction_default_max_cap_is_025() -> None:
+    # The production default max_cap should remain 0.25 when callers omit the
+    # argument; this guards against accidental signature drift.
+    capped_explicit = kelly_fraction(0.8, 100, fraction=1.0, max_cap=0.25)
+    capped_default = kelly_fraction(0.8, 100, fraction=1.0)
+    assert pytest.approx(capped_default) == capped_explicit
+
+
 def test_kelly_fraction_guaranteed_win_sizes_bankroll() -> None:
     # win_prob=1.0 with positive odds is a risk-free bet: Kelly must return
     # a positive, non-capped fraction (full edge, no clamps triggered).
