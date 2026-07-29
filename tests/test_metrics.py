@@ -159,6 +159,21 @@ def test_calibration_curve_single_bin() -> None:
     assert curve[0]["count"] == 2
 
 
+def test_calibration_curve_returns_valid_calibration_bins() -> None:
+    """Every non-empty bin returned by calibration_curve must be a valid
+    CalibrationBin dict containing all five required keys, so callers can
+    destructure results without KeyError."""
+    required_keys = set(CalibrationBin.__annotations__)
+    curve = calibration_curve(
+        [0.15, 0.25, 0.35, 0.75, 0.85, 0.95],
+        [0.0, 1.0, 0.0, 1.0, 1.0, 1.0],
+        bins=5,
+    )
+    assert curve  # non-empty
+    for bin_ in curve:
+        assert set(bin_.keys()) == required_keys
+
+
 def test_calibration_curve_validation() -> None:
     with pytest.raises(ValueError, match="bins must be at least 1"):
         calibration_curve([0.5], [1.0], bins=0)
