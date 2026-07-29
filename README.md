@@ -59,12 +59,12 @@ from nba_edge import (
 
 # 1. Ratings & win probability
 p = logistic_win_prob(rating_diff=120)
-margin = expected_margin(rating_diff=120)            # Predicted point spread
+margin = expected_margin(rating_diff=120)  # Predicted point spread
 mov = mov_multiplier(margin=22, elo_diff_winner=120)  # MOV weighting factor
 new_h, new_a = update_elo(1600, 1580, 1.0)
 
 # 2. Odds conversions & Vig Removal
-dec = american_to_decimal(-110)      # Convert American to Decimal
+dec = american_to_decimal(-110)  # Convert American to Decimal
 p_implied = american_to_implied_prob(-110)  # Convert American to Implied Probability
 p_fair_h, p_fair_a = remove_vig(-110, -110, method="proportional")  # Remove vig
 
@@ -93,7 +93,7 @@ and less when a team that was already heavily favored piles on:
 ```python
 from nba_edge import update_elo_with_margin, expected_margin, mov_multiplier
 
-predicted_spread = expected_margin(rating_diff=120)          # toy mapping
+predicted_spread = expected_margin(rating_diff=120)  # toy mapping
 mov_factor = mov_multiplier(margin=22, elo_diff_winner=120)  # weighting factor
 new_h, new_a = update_elo_with_margin(1600, 1580, 1.0, margin=22)
 ```

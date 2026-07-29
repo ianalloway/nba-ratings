@@ -5,6 +5,7 @@ the published package (the CLV dashboard, line-shop tooling, etc.). It is meant
 to fail loudly if a public symbol is renamed, dropped, or omitted from
 ``__all__``, or if ``__version__`` ever stops being a valid version string.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -62,6 +63,5 @@ def test_version_matches_pyproject_toml() -> None:
     m = re.search(r'(?m)^version\s*=\s*"([^"]+)"', content)
     assert m is not None, "version field not found in pyproject.toml"
     assert nba_edge.__version__ == m.group(1), (
-        f"nba_edge.__version__={nba_edge.__version__!r} != "
-        f"pyproject.toml version={m.group(1)!r}"
+        f"nba_edge.__version__={nba_edge.__version__!r} != pyproject.toml version={m.group(1)!r}"
     )
