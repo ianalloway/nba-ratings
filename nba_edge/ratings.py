@@ -52,9 +52,14 @@ def update_elo(
     scale: float = 400.0,
 ) -> tuple[float, float]:
     """Elo update after match; score_a in {0, 0.5, 1} for loss/draw/win."""
+    if not math.isfinite(rating_a) or not math.isfinite(rating_b):
+        raise ValueError(f"ratings must be finite, got rating_a={rating_a}, rating_b={rating_b}")
+    if not math.isfinite(k) or k <= 0:
+        raise ValueError(f"k must be a positive finite number, got {k}")
+    if not math.isfinite(scale) or scale <= 0:
+        raise ValueError(f"scale must be a positive finite number, got {scale}")
     if score_a not in (0, 0.5, 1):
         raise ValueError(f"score_a must be 0, 0.5, or 1, got {score_a}")
-    if k <= 0:
         raise ValueError(f"k must be positive, got {k}")
     if scale <= 0:
         raise ValueError(f"scale must be positive, got {scale}")
@@ -102,6 +107,14 @@ def update_elo_with_margin(
     Same semantics as `update_elo`, plus `margin`: the game's absolute point
     differential. A 30-point win moves ratings more than a 2-point win.
     """
+    if not math.isfinite(rating_a) or not math.isfinite(rating_b):
+        raise ValueError(f"ratings must be finite, got rating_a={rating_a}, rating_b={rating_b}")
+    if not math.isfinite(k) or k <= 0:
+        raise ValueError(f"k must be a positive finite number, got {k}")
+    if not math.isfinite(scale) or scale <= 0:
+        raise ValueError(f"scale must be a positive finite number, got {scale}")
+    if not math.isfinite(margin) or margin < 0:
+        raise ValueError(f"margin must be a non-negative finite number, got {margin}")
     if score_a not in (0, 0.5, 1):
         raise ValueError(f"score_a must be 0, 0.5, or 1, got {score_a}")
     if k <= 0:

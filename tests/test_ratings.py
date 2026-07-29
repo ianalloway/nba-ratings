@@ -63,10 +63,21 @@ def test_update_elo_rejects_invalid_score() -> None:
 
 
 def test_update_elo_rejects_nonpositive_k_and_scale() -> None:
-    with pytest.raises(ValueError, match="k must be positive"):
+    with pytest.raises(ValueError, match="must be a positive finite number"):
         update_elo(1500.0, 1500.0, 1.0, k=0.0)
-    with pytest.raises(ValueError, match="scale must be positive"):
+    with pytest.raises(ValueError, match="must be a positive finite number"):
         update_elo(1500.0, 1500.0, 1.0, scale=-100.0)
+
+
+def test_update_elo_rejects_nonfinite_ratings() -> None:
+    with pytest.raises(ValueError, match="ratings must be finite"):
+        update_elo(1500.0, float("nan"), 1.0)
+    with pytest.raises(ValueError, match="ratings must be finite"):
+        update_elo(float("inf"), 1500.0, 1.0)
+    with pytest.raises(ValueError, match="must be a positive finite number"):
+        update_elo(1500.0, 1500.0, 1.0, scale=float("nan"))
+    with pytest.raises(ValueError, match="must be a positive finite number"):
+        update_elo(1500.0, 1500.0, 1.0, k=float("inf"))
 
 
 def test_update_elo_with_margin_conserves_rating_mass() -> None:
@@ -103,7 +114,7 @@ def test_update_elo_with_margin_underdog_upset_moves_more_than_fav_blowout() -> 
 
 
 def test_update_elo_with_margin_rejects_negative_margin() -> None:
-    with pytest.raises(ValueError, match="margin must be non-negative"):
+    with pytest.raises(ValueError, match="margin must be a non-negative finite number"):
         update_elo_with_margin(1500.0, 1450.0, 1.0, -5.0)
 
 
@@ -122,6 +133,15 @@ def test_update_elo_with_margin_pole_underdog_conserves_mass() -> None:
     assert pytest.approx(a + b) == pytest.approx(base_a + base_b)
     assert a > base_a  # underdog winner gains ratings
     assert b < base_b  # favorite loser sheds ratings
+
+
+def test_update_elo_with_margin_rejects_nonfinite_ratings() -> None:
+    with pytest.raises(ValueError, match="ratings must be finite"):
+        update_elo_with_margin(1500.0, float("nan"), 1.0, 10.0)
+    with pytest.raises(ValueError, match="ratings must be finite"):
+        update_elo_with_margin(float("inf"), 1500.0, 1.0, 10.0)
+    with pytest.raises(ValueError, match="margin must be a non-negative finite number"):
+        update_elo_with_margin(1500.0, 1500.0, 1.0, float("inf"))
 
 
 def test_update_elo_with_margin_beyond_pole_stays_stable() -> None:
