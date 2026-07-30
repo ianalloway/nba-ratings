@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 
 def american_to_implied_prob(american: float) -> float:
     """Convert American odds to implied probability."""
@@ -120,7 +122,7 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
         return fair_a, fair_b
 
 
-def parlay_odds(odds_list: list[float]) -> dict[str, float]:
+def parlay_odds(odds_list: Sequence[float]) -> dict[str, float]:
     """Calculate the combined decimal odds, American odds, and implied probability of a parlay.
 
     Assumes all legs are independent.
