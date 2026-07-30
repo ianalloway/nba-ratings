@@ -193,6 +193,15 @@ def test_update_elo_with_margin_rejects_invalid_score_and_params() -> None:
             update_elo_with_margin(1500.0, 1500.0, 1.0, 10.0, scale=scale)
 
 
+def test_update_elo_with_margin_rejects_nonfinite_params() -> None:
+    with pytest.raises(ValueError):
+        update_elo_with_margin(float("nan"), 1500.0, 1.0, 10.0)
+    with pytest.raises(ValueError):
+        update_elo_with_margin(1500.0, 1500.0, 1.0, float("inf"), k=20.0)
+    with pytest.raises(ValueError):
+        update_elo_with_margin(1500.0, 1500.0, 1.0, 10.0, scale=float("-inf"))
+
+
 def test_update_elo_winner_always_gains_loser_always_loses() -> None:
     for ra, rb in ((1500.0, 1500.0), (1600.0, 1400.0), (1400.0, 1600.0)):
         a_win, b_win = update_elo(ra, rb, 1.0)

@@ -114,12 +114,6 @@ def update_elo_with_margin(
         raise ValueError(f"margin must be a non-negative finite number, got {margin}")
     if score_a not in (0, 0.5, 1):
         raise ValueError(f"score_a must be 0, 0.5, or 1, got {score_a}")
-    if k <= 0:
-        raise ValueError(f"k must be positive, got {k}")
-    if scale <= 0:
-        raise ValueError(f"scale must be positive, got {scale}")
-    if margin < 0:
-        raise ValueError(f"margin must be non-negative, got {margin}")
 
     exp_a = logistic_win_prob(rating_a - rating_b, scale=scale)
 
