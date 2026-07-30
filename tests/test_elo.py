@@ -106,6 +106,24 @@ def test_expected_margin_never_divides_by_zero() -> None:
     assert pytest.approx(expected_margin(150.0, margin_per_elo=0.0)) == 0.0
 
 
+def test_expected_margin_rejects_nonfinite_rating_diff() -> None:
+    with pytest.raises(ValueError, match="rating_diff must be finite"):
+        expected_margin(float("nan"))
+    with pytest.raises(ValueError, match="rating_diff must be finite"):
+        expected_margin(float("inf"))
+    with pytest.raises(ValueError, match="rating_diff must be finite"):
+        expected_margin(float("-inf"))
+
+
+def test_expected_margin_rejects_nonfinite_margin_per_elo() -> None:
+    with pytest.raises(ValueError, match="margin_per_elo must be finite"):
+        expected_margin(100.0, margin_per_elo=float("nan"))
+    with pytest.raises(ValueError, match="margin_per_elo must be finite"):
+        expected_margin(100.0, margin_per_elo=float("inf"))
+    with pytest.raises(ValueError, match="margin_per_elo must be finite"):
+        expected_margin(100.0, margin_per_elo=float("-inf"))
+
+
 def test_expected_margin_rejects_negative_slope() -> None:
     # The docstring guarantees the sign is tied to rating_diff for non-negative
     # slopes; a negative slope would silently flip the sign, so it must be rejected.
