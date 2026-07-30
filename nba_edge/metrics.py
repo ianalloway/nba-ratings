@@ -8,6 +8,17 @@ from typing import TypedDict
 
 
 class CalibrationBin(TypedDict):
+    """A single bin in a calibration reliability diagram.
+
+    Attributes:
+        bin_low: Lower bound of the predicted-probability bin (inclusive).
+        bin_high: Upper bound of the predicted-probability bin (exclusive, except
+            for the last bin whose upper bound absorbs any predictions at 1.0).
+        mean_predicted: Average predicted probability assigned to observations
+            inside this bin.
+        mean_actual: Empirical win rate for observations inside this bin.
+        count: Number of predictions that fell into this bin.
+    """
     bin_low: float
     bin_high: float
     mean_predicted: float
