@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def american_to_implied_prob(american: float) -> float:
@@ -69,6 +72,7 @@ def kelly_fraction(
         american_odds: Oddsmaker American odds (e.g., -110 or +150).
         fraction: Kelly multiplier/fraction (e.g., 0.25 for quarter-Kelly).
         max_cap: Maximum fraction of bankroll to risk. Set to None for no cap.
+
     """
     if not (0.0 <= win_prob <= 1.0):
         raise ValueError(f"Win probability must be between 0.0 and 1.0, got {win_prob}")
@@ -98,6 +102,7 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
 
     Returns:
         A tuple containing the fair probabilities of outcome A and B (summing to 1.0).
+
     """
     if method not in ("proportional", "equal"):
         raise ValueError(f"Unsupported method: {method}. Must be 'proportional' or 'equal'.")
@@ -135,6 +140,7 @@ def parlay_odds(odds_list: Sequence[float]) -> dict[str, float]:
             'decimal': Combined decimal odds.
             'american': Combined American odds.
             'implied_prob': Combined implied probability of the parlay.
+
     """
     if not odds_list:
         raise ValueError("odds_list cannot be empty")
@@ -173,6 +179,7 @@ def kelly_parlay(
 
     Returns:
         The fraction of bankroll to wager on the parlay.
+
     """
     if len(win_probs) != len(odds_list):
         raise ValueError(

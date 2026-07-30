@@ -37,6 +37,7 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
 
     Returns:
         Predicted point margin (positive = home favored, negative = away).
+
     """
     if not math.isfinite(rating_diff):
         raise ValueError(
@@ -84,6 +85,7 @@ def mov_multiplier(margin: float, elo_diff_winner: float) -> float:
     Args:
         margin: Absolute point differential of the game (>= 0).
         elo_diff_winner: rating_winner - rating_loser, before this game.
+
     """
     if margin < 0:
         raise ValueError(f"margin must be non-negative, got {margin}")

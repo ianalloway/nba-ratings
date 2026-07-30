@@ -18,7 +18,9 @@ class CalibrationBin(TypedDict):
             inside this bin.
         mean_actual: Empirical win rate for observations inside this bin.
         count: Number of predictions that fell into this bin.
+
     """
+
     bin_low: float
     bin_high: float
     mean_predicted: float
@@ -41,6 +43,7 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
 
     Returns:
         The Brier Score as a float.
+
     """
     if isinstance(predictions, (int, float)):
         preds = [float(predictions)]
@@ -87,6 +90,7 @@ def log_loss(
 
     Returns:
         The mean log loss as a float.
+
     """
     if isinstance(predictions, (int, float)):
         preds = [float(predictions)]
@@ -149,6 +153,7 @@ def calibration_curve(
         #   'mean_predicted': 0.55, 'mean_actual': 1.0, 'count': 1},
         #  {'bin_low': 0.6, 'bin_high': 0.7, 'mean_predicted': 0.6, 'mean_actual': 1.0, 'count': 1},
         #  {'bin_low': 0.7, 'bin_high': 0.8, 'mean_predicted': 0.7, 'mean_actual': 1.0, 'count': 1}]
+
     """
     if bins < 1:
         raise ValueError(f"bins must be at least 1, got {bins}")
