@@ -45,6 +45,8 @@ def test_decimal_to_american() -> None:
 
     with pytest.raises(ValueError):
         decimal_to_american(0.5)
+    with pytest.raises(ValueError):
+        decimal_to_american(1.0)
 
 
 def test_decimal_to_implied_prob() -> None:
@@ -240,6 +242,13 @@ def test_kelly_parlay() -> None:
     # Empty inputs
     with pytest.raises(ValueError):
         kelly_parlay([], [])
+
+
+def test_kelly_parlay_tuple_input_matches_list_input() -> None:
+    """kelly_parlay typed as Sequence[float] must accept tuples as well as lists."""
+    list_val = kelly_parlay([0.6, 0.7], [-110, -110], fraction=0.25, max_cap=None)
+    tuple_val = kelly_parlay((0.6, 0.7), (-110, -110), fraction=0.25, max_cap=None)
+    assert pytest.approx(tuple_val) == list_val
 
 
 def test_kelly_parlay_single_leg_matches_kelly_fraction() -> None:

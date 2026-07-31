@@ -27,6 +27,15 @@ def test_parlay_odds_two_legs_joint_probability_and_decimal() -> None:
     assert res["decimal"] == pytest.approx(expected_dec)
 
 
+def test_parlay_odds_tuple_input_matches_list_input() -> None:
+    """parlay_odds typed as Sequence[float] must accept tuples as well as lists."""
+    list_res = parlay_odds([-110, -110])
+    tuple_res = parlay_odds((-110, -110))
+    assert pytest.approx(tuple_res["decimal"]) == list_res["decimal"]
+    assert pytest.approx(tuple_res["american"]) == list_res["american"]
+    assert pytest.approx(tuple_res["implied_prob"]) == list_res["implied_prob"]
+
+
 def test_parlay_odds_american_round_trips_to_decimal() -> None:
     legs = [-110, -110]
     res = parlay_odds(legs)

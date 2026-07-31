@@ -163,8 +163,8 @@ def parlay_odds(odds_list: Sequence[float]) -> dict[str, float]:
 
 
 def kelly_parlay(
-    win_probs: list[float],
-    odds_list: list[float],
+    win_probs: Sequence[float],
+    odds_list: Sequence[float],
     *,
     fraction: float = 0.25,
     max_cap: float | None = 0.25,
