@@ -40,13 +40,9 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
 
     """
     if not math.isfinite(rating_diff):
-        raise ValueError(
-            f"rating_diff must be finite, got {rating_diff!r}"
-        )
+        raise ValueError(f"rating_diff must be finite, got {rating_diff!r}")
     if not math.isfinite(margin_per_elo):
-        raise ValueError(
-            f"margin_per_elo must be finite, got {margin_per_elo!r}"
-        )
+        raise ValueError(f"margin_per_elo must be finite, got {margin_per_elo!r}")
     if margin_per_elo < 0:
         raise ValueError(f"margin_per_elo must be non-negative, got {margin_per_elo}")
     return rating_diff * margin_per_elo
