@@ -30,10 +30,17 @@ def test_logistic_win_prob_symmetry() -> None:
 
 
 def test_logistic_win_prob_rejects_nonpositive_scale() -> None:
-    with pytest.raises(ValueError, match="scale must be positive"):
+    with pytest.raises(ValueError, match="scale must be a positive finite number"):
         logistic_win_prob(100.0, scale=0.0)
-    with pytest.raises(ValueError, match="scale must be positive"):
+    with pytest.raises(ValueError, match="scale must be a positive finite number"):
         logistic_win_prob(100.0, scale=-400.0)
+
+
+def test_logistic_win_prob_rejects_nonfinite_scale() -> None:
+    """Non-finite scale must raise rather than silently return NaN or garbage."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="scale must be a positive finite number"):
+            logistic_win_prob(100.0, scale=bad)
 
 
 def test_logistic_win_prob_extreme_underdog_no_overflow() -> None:

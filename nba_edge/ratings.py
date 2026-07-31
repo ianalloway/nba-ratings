@@ -12,8 +12,8 @@ _MIN_MOV_DENOM: float = 1e-3
 
 def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
     """P(home beats away) given rating_home - rating_away (Elo logistic)."""
-    if scale <= 0:
-        raise ValueError(f"scale must be positive, got {scale}")
+    if not math.isfinite(scale) or scale <= 0:
+        raise ValueError(f"scale must be a positive finite number, got {scale}")
     try:
         return 1.0 / (1.0 + math.pow(10.0, -rating_diff / scale))
     except OverflowError:
