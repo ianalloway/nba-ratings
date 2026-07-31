@@ -43,6 +43,18 @@ def test_logistic_win_prob_rejects_nonfinite_scale() -> None:
             logistic_win_prob(100.0, scale=bad)
 
 
+def test_logistic_win_prob_rejects_nonfinite_rating_diff() -> None:
+    """Non-finite rating_diff must raise rather than silently returning NaN/0/1.
+
+    Previously only ``scale`` was guarded; NaN/inf/-inf on rating_diff slipped
+    past the OverflowError handler and returned nan (or 1.0/0.0), poisoning any
+    downstream Elo update that depends on the returned probability.
+    """
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="rating_diff must be finite"):
+            logistic_win_prob(bad)
+
+
 def test_logistic_win_prob_extreme_underdog_no_overflow() -> None:
     # Very large negative diff used to raise OverflowError; now clamps to ~0.
     assert logistic_win_prob(-1e10) == pytest.approx(0.0)
