@@ -28,6 +28,13 @@ def test_american_to_implied_prob() -> None:
         american_to_implied_prob(50)
 
 
+def test_american_to_implied_prob_rejects_nonfinite_odds() -> None:
+    """Non-finite American odds must raise rather than silently returning NaN."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="American odds must be finite"):
+            american_to_implied_prob(bad)
+
+
 def test_american_to_decimal() -> None:
     assert pytest.approx(american_to_decimal(100.0)) == 2.0
     assert pytest.approx(american_to_decimal(200.0)) == 3.0
@@ -36,6 +43,12 @@ def test_american_to_decimal() -> None:
 
     with pytest.raises(ValueError):
         american_to_decimal(-50)
+
+
+def test_american_to_decimal_rejects_nonfinite_odds() -> None:
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="American odds must be finite"):
+            american_to_decimal(bad)
 
 
 def test_decimal_to_american() -> None:
@@ -49,6 +62,12 @@ def test_decimal_to_american() -> None:
         decimal_to_american(1.0)
 
 
+def test_decimal_to_american_rejects_nonfinite_odds() -> None:
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="Decimal odds must be finite"):
+            decimal_to_american(bad)
+
+
 def test_decimal_to_implied_prob() -> None:
     assert pytest.approx(decimal_to_implied_prob(2.0)) == 0.5
     assert pytest.approx(decimal_to_implied_prob(4.0)) == 0.25
@@ -57,6 +76,12 @@ def test_decimal_to_implied_prob() -> None:
         decimal_to_implied_prob(0.9)
     with pytest.raises(ValueError):
         decimal_to_implied_prob(1.0)
+
+
+def test_decimal_to_implied_prob_rejects_nonfinite_odds() -> None:
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="Decimal odds must be finite"):
+            decimal_to_implied_prob(bad)
 
 
 def test_implied_prob_to_american() -> None:

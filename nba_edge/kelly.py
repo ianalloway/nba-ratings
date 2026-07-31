@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,6 +11,8 @@ if TYPE_CHECKING:
 
 def american_to_implied_prob(american: float) -> float:
     """Convert American odds to implied probability."""
+    if not math.isfinite(american):
+        raise ValueError(f"American odds must be finite, got {american}")
     if -100 < american < 100:
         raise ValueError(f"American odds cannot be between -100 and 100, got {american}")
     if american > 0:
@@ -19,6 +22,8 @@ def american_to_implied_prob(american: float) -> float:
 
 def american_to_decimal(american: float) -> float:
     """Convert American odds to decimal odds (return >= 1.0)."""
+    if not math.isfinite(american):
+        raise ValueError(f"American odds must be finite, got {american}")
     if -100 < american < 100:
         raise ValueError(f"American odds cannot be between -100 and 100, got {american}")
     if american > 0:
@@ -28,6 +33,8 @@ def american_to_decimal(american: float) -> float:
 
 def decimal_to_american(decimal: float) -> float:
     """Convert decimal odds to American odds."""
+    if not math.isfinite(decimal):
+        raise ValueError(f"Decimal odds must be finite, got {decimal}")
     if decimal <= 1.0:
         raise ValueError(f"Decimal odds must be strictly greater than 1.0, got {decimal}")
     if decimal >= 2.0:
@@ -37,6 +44,8 @@ def decimal_to_american(decimal: float) -> float:
 
 def decimal_to_implied_prob(decimal: float) -> float:
     """Convert decimal odds to implied probability."""
+    if not math.isfinite(decimal):
+        raise ValueError(f"Decimal odds must be finite, got {decimal}")
     if decimal <= 1.0:
         raise ValueError(f"Decimal odds must be strictly greater than 1.0, got {decimal}")
     return 1.0 / decimal
