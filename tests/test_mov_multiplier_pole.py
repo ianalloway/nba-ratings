@@ -7,6 +7,10 @@ extreme underdog wins; without it a huge upset would raise ZeroDivisionError or
 flip the sign of the rating update. This module restores that coverage.
 """
 
+import math
+
+import pytest
+
 from nba_edge.ratings import mov_multiplier
 
 
@@ -27,3 +31,29 @@ def test_mov_multiplier_clamped_below_pole_is_finite() -> None:
     mult = mov_multiplier(30.0, elo_diff_winner=-10000.0)
     assert mult > 0.0
     assert abs(mult) < 1e6
+
+
+def test_mov_multiplier_rejects_non_finite_inputs() -> None:
+    """mov_multiplier is public API and must reject NaN/inf like its siblings.
+
+    Previously a non-finite margin or elo_diff_winner sailed through the
+    ``margin < 0`` guard (NaN comparisons are always False) and returned
+    nan/inf, silently poisoning every downstream Elo rating instead of
+    failing loudly. update_elo_with_margin already rejected these inputs.
+    """
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="margin must be a non-negative finite number"):
+            mov_multiplier(bad, 0.0)
+
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="elo_diff_winner must be finite"):
+            mov_multiplier(30.0, bad)
+
+
+def test_mov_multiplier_finite_for_all_valid_inputs() -> None:
+    """The stated invariant: valid inputs always yield a finite, positive multiplier."""
+    for margin in (0.0, 1.0, 30.0, 1e6):
+        for diff in (-5000.0, -2200.0, -100.0, 0.0, 100.0, 5000.0):
+            val = mov_multiplier(margin, diff)
+            assert math.isfinite(val)
+            assert val >= 0.0

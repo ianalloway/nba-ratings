@@ -79,12 +79,20 @@ def mov_multiplier(margin: float, elo_diff_winner: float) -> float:
     a heavy favorite blowing out a weak team would gain ratings forever).
 
     Args:
-        margin: Absolute point differential of the game (>= 0).
-        elo_diff_winner: rating_winner - rating_loser, before this game.
+        margin: Absolute point differential of the game (>= 0, finite).
+        elo_diff_winner: rating_winner - rating_loser, before this game (finite).
+
+    Raises:
+        ValueError: If ``margin`` is negative or non-finite, or if
+            ``elo_diff_winner`` is non-finite. Without these checks a NaN or
+            inf input silently propagates into the returned multiplier and
+            poisons every downstream Elo rating.
 
     """
-    if margin < 0:
-        raise ValueError(f"margin must be non-negative, got {margin}")
+    if not math.isfinite(margin) or margin < 0:
+        raise ValueError(f"margin must be a non-negative finite number, got {margin}")
+    if not math.isfinite(elo_diff_winner):
+        raise ValueError(f"elo_diff_winner must be finite, got {elo_diff_winner}")
 
     # The dampening factor 2.2 / (0.001 * elo_diff_winner + 2.2) has a pole at
     # elo_diff_winner == -2200 (raw ZeroDivisionError) and goes negative for any
