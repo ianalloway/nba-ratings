@@ -85,8 +85,12 @@ def kelly_fraction(
     """
     if not (0.0 <= win_prob <= 1.0):
         raise ValueError(f"Win probability must be between 0.0 and 1.0, got {win_prob}")
+    if not math.isfinite(american_odds):
+        raise ValueError(f"American odds must be finite, got {american_odds}")
     if -100 < american_odds < 100:
         raise ValueError(f"American odds cannot be between -100 and 100, got {american_odds}")
+    if not math.isfinite(fraction):
+        raise ValueError(f"fraction must be finite, got {fraction}")
     if american_odds > 0:
         b = american_odds / 100.0
     else:
@@ -95,7 +99,7 @@ def kelly_fraction(
     full = (b * win_prob - q) / b if b > 0 else 0.0
     val = fraction * full
     if max_cap is not None:
-        if max_cap < 0.0 or max_cap > 1.0:
+        if not math.isfinite(max_cap) or max_cap < 0.0 or max_cap > 1.0:
             raise ValueError(f"max_cap must be between 0.0 and 1.0 (or None), got {max_cap}")
         val = min(max_cap, val)
     return max(0.0, val)
@@ -196,6 +200,8 @@ def kelly_parlay(
         )
     if not win_probs:
         raise ValueError("Input lists cannot be empty")
+    if not math.isfinite(fraction):
+        raise ValueError(f"fraction must be finite, got {fraction}")
 
     # Combined win probability (assuming independence)
     joint_prob = 1.0
@@ -215,7 +221,7 @@ def kelly_parlay(
     full = (b * joint_prob - q) / b if b > 0.0 else 0.0
     val = fraction * full
     if max_cap is not None:
-        if max_cap < 0.0 or max_cap > 1.0:
+        if not math.isfinite(max_cap) or max_cap < 0.0 or max_cap > 1.0:
             raise ValueError(f"max_cap must be between 0.0 and 1.0 (or None), got {max_cap}")
         val = min(max_cap, val)
     return max(0.0, val)

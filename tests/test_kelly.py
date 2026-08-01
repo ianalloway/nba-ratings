@@ -456,3 +456,38 @@ def test_parlay_odds_rejects_invalid_leg_odds() -> None:
         parlay_odds([50])
     with pytest.raises(ValueError):
         parlay_odds([-110, 50, -110])
+
+
+def test_kelly_fraction_rejects_nonfinite_american_odds() -> None:
+    """Non-finite American odds must raise rather than silently returning 0.0."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="American odds must be finite"):
+            kelly_fraction(0.6, bad, fraction=1.0, max_cap=None)
+
+
+def test_kelly_fraction_rejects_nonfinite_fraction() -> None:
+    """Non-finite fraction must raise rather than propagating NaN downstream."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="fraction must be finite"):
+            kelly_fraction(0.6, 100, fraction=bad, max_cap=None)
+
+
+def test_kelly_fraction_rejects_nonfinite_max_cap() -> None:
+    """Non-finite max_cap must raise rather than silently producing a bad clamp."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="max_cap must be between"):
+            kelly_fraction(0.6, 100, fraction=1.0, max_cap=bad)
+
+
+def test_kelly_parlay_rejects_nonfinite_fraction() -> None:
+    """Non-finite fraction must raise rather than propagating NaN downstream."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="fraction must be finite"):
+            kelly_parlay([0.6, 0.7], [-110, -110], fraction=bad, max_cap=None)
+
+
+def test_kelly_parlay_rejects_nonfinite_max_cap() -> None:
+    """Non-finite max_cap must raise rather than silently producing a bad clamp."""
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="max_cap must be between"):
+            kelly_parlay([0.6, 0.7], [-110, -110], fraction=1.0, max_cap=bad)
