@@ -92,6 +92,10 @@ def log_loss(
         The mean log loss as a float.
 
     """
+    if not math.isfinite(eps) or eps <= 0.0 or eps >= 0.5:
+        raise ValueError(
+            f"eps must be a finite value in (0, 0.5), got {eps}"
+        )
     if isinstance(predictions, (int, float)):
         preds = [float(predictions)]
     else:

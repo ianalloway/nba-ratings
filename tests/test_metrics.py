@@ -111,6 +111,33 @@ def test_log_loss_boundary_wrong_prediction_clipped() -> None:
     assert wider_wrong < default_wrong
 
 
+def test_log_loss_rejects_non_positive_eps() -> None:
+    # eps <= 0 defeats the [eps, 1-eps] clipping and allows log(0) to crash.
+    for bad in (0.0, -0.01, -1e-15):
+        with pytest.raises(ValueError, match="eps must be a finite value in"):
+            log_loss(1.0, 1.0, eps=bad)
+
+
+def test_log_loss_rejects_eps_at_or_above_half() -> None:
+    # eps >= 0.5 collapses the clipping interval [eps, 1-eps] to a point or
+    # an empty range, silently flattening every prediction to a single value.
+    for bad in (0.5, 0.6, 0.999999, 1.0, 2.0):
+        with pytest.raises(ValueError, match="eps must be a finite value in"):
+            log_loss(0.5, 1.0, eps=bad)
+
+
+def test_log_loss_rejects_nonfinite_eps() -> None:
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="eps must be a finite value in"):
+            log_loss(1.0, 1.0, eps=bad)
+
+
+def test_log_loss_default_eps_does_not_raise() -> None:
+    # The documented default (1e-15) must still work for boundary predictions.
+    assert log_loss(1.0, 1.0) == pytest.approx(0.0, abs=1e-12)
+    assert log_loss(0.0, 0.0) == pytest.approx(0.0, abs=1e-12)
+
+
 def test_calibration_curve_basic_binning() -> None:
     # Two predictions in 0.6-0.7 bin, one in 0.8-0.9 bin
     preds = [0.65, 0.62, 0.85]
