@@ -137,6 +137,19 @@ def test_kelly_fraction_calculation() -> None:
     assert pytest.approx(kelly_fraction(0.4, 100, fraction=1.0)) == 0.0
 
 
+def test_kelly_fraction_negative_american_odds() -> None:
+    # Covers the negative-odds 'else' branch (b = 100 / abs(american_odds)).
+    # All existing kelly_fraction tests only exercised positive (+100) odds.
+    # -110: b = 100/110 ~= 0.9091, full = (0.9091*0.6 - 0.4)/0.9091 = 0.16
+    assert pytest.approx(kelly_fraction(0.6, -110, fraction=0.25)) == 0.04
+    # -200 (stronger favorite): b = 100/200 = 0.5, full = (0.5*0.7 - 0.3)/0.5 = 0.1
+    assert pytest.approx(kelly_fraction(0.7, -200, fraction=0.25)) == 0.025
+    # Full Kelly (no cap) on a favorite still scales by fraction correctly
+    assert pytest.approx(kelly_fraction(0.6, -110, fraction=1.0, max_cap=None)) == 0.16
+    # Guaranteed win on a favorite is positive but bounded by the default cap
+    assert 0.0 < kelly_fraction(1.0, -110, fraction=1.0) <= 0.25
+
+
 def test_kelly_fraction_default_max_cap_is_025() -> None:
     # The production default max_cap should remain 0.25 when callers omit the
     # argument; this guards against accidental signature drift.
