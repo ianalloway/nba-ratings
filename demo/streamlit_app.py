@@ -81,6 +81,11 @@ with tab_kelly:
         frac = st.select_slider("Kelly fraction", [0.1, 0.25, 0.5, 1.0], value=0.25)
         bankroll = st.number_input("Bankroll ($)", 100, 100000, 1000, step=100)
     with c2:
+        # American odds cannot fall between -100 and +100; guard so invalid
+        # selections (e.g. 0, 50, -50) don't crash the app with ValueError.
+        if -100 < odds < 100:
+            st.error(f"Invalid odds ({odds}): American odds must be ≤ -100 or ≥ +100.")
+            st.stop()
         implied = american_to_implied_prob(odds)
         stake = kelly_fraction(win_prob, odds, fraction=frac)
         edge = win_prob - implied

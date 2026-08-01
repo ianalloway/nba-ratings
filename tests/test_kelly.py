@@ -173,6 +173,18 @@ def test_kelly_fraction_guaranteed_win_sizes_bankroll() -> None:
     assert k_guaranteed > k_near_certain
 
 
+def test_kelly_fraction_guaranteed_win_on_negative_odds() -> None:
+    # A guaranteed win (win_prob=1.0) on a favorite must also return a
+    # positive Kelly fraction: the edge is real, only the payout is smaller.
+    assert kelly_fraction(1.0, -110, fraction=1.0, max_cap=None) > 0.0
+    # With the default cap (0.25) the fraction is still positive and bounded.
+    assert 0.0 < kelly_fraction(1.0, -110, fraction=1.0) <= 0.25
+    # Guaranteed win on a favorite beats a near-certain win at the same odds.
+    k_g = kelly_fraction(1.0, -110, fraction=0.25)
+    k_n = kelly_fraction(0.9, -110, fraction=0.25)
+    assert k_g > k_n
+
+
 def test_remove_vig() -> None:
     # Coexist in -110 / -110 market
     # Implied prob = 110/210 ≈ 0.5238 each, total ≈ 1.0476
@@ -308,6 +320,14 @@ def test_kelly_parlay_single_leg_matches_kelly_fraction() -> None:
     assert pytest.approx(
         kelly_parlay([0.99], [1000], fraction=1.0, max_cap=0.25)
     ) == kelly_fraction(0.99, 1000, fraction=1.0, max_cap=0.25)
+
+    # Single leg with negative (favorite) odds must also match kelly_fraction
+    assert pytest.approx(
+        kelly_parlay([0.9], [-110], fraction=0.25, max_cap=None)
+    ) == kelly_fraction(0.9, -110, fraction=0.25, max_cap=None)
+    assert pytest.approx(
+        kelly_parlay([0.9], [-110], fraction=0.25)
+    ) == kelly_fraction(0.9, -110, fraction=0.25)
 
 
 def test_kelly_parlay_returns_zero_on_losing_edge() -> None:
