@@ -15,3 +15,8 @@ dist/
 !env.example
 *.pem
 *.key
+
+# Coverage.py artifacts (pytest-cov, coverage run)
+.coverage
+.coverage.*
+htmlcov/
