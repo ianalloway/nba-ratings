@@ -202,7 +202,7 @@ def test_calibration_curve_returns_valid_calibration_bins() -> None:
 
 
 def test_calibration_curve_validation() -> None:
-    with pytest.raises(ValueError, match="bins must be at least 1"):
+    with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
         calibration_curve([0.5], [1.0], bins=0)
 
     with pytest.raises(ValueError, match="Lengths.*must match"):
@@ -216,3 +216,13 @@ def test_calibration_curve_validation() -> None:
 
     with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
         calibration_curve([0.5], [0.5])
+
+
+def test_calibration_curve_rejects_nonfinite_bins() -> None:
+    # Every other numeric-parameter function in nba_edge guards against
+    # non-finite inputs (math.isfinite); calibration_curve must too, so a
+    # NaN/inf bin count raises a clean ValueError instead of crashing
+    # range()/division with a confusing TypeError.
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
+            calibration_curve([0.5], [1.0], bins=bad)  # type: ignore[arg-type]
