@@ -325,9 +325,9 @@ def test_kelly_parlay_single_leg_matches_kelly_fraction() -> None:
     assert pytest.approx(
         kelly_parlay([0.9], [-110], fraction=0.25, max_cap=None)
     ) == kelly_fraction(0.9, -110, fraction=0.25, max_cap=None)
-    assert pytest.approx(
-        kelly_parlay([0.9], [-110], fraction=0.25)
-    ) == kelly_fraction(0.9, -110, fraction=0.25)
+    assert pytest.approx(kelly_parlay([0.9], [-110], fraction=0.25)) == kelly_fraction(
+        0.9, -110, fraction=0.25
+    )
 
 
 def test_kelly_parlay_returns_zero_on_losing_edge() -> None:
