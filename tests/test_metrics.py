@@ -226,3 +226,34 @@ def test_calibration_curve_rejects_nonfinite_bins() -> None:
     for bad in (float("nan"), float("inf"), float("-inf")):
         with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
             calibration_curve([0.5], [1.0], bins=bad)  # type: ignore[arg-type]
+
+
+def test_brier_score_rejects_nonfinite_inputs() -> None:
+    # NaN/inf predictions and outcomes must raise ValueError, not silently
+    # produce NaN downstream (matches the pattern used in test_kelly and
+    # test_elo for non-finite guards).
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="Predicted probability must be between 0 and 1"):
+            brier_score(bad, 1.0)
+        with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
+            brier_score(0.5, bad)
+
+
+def test_log_loss_rejects_nonfinite_inputs() -> None:
+    # Non-finite predictions and outcomes must raise before reaching the
+    # log() call, matching the validation style of brier_score.
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="Predicted probability must be between 0 and 1"):
+            log_loss(bad, 1.0)
+        with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
+            log_loss(0.5, bad)
+
+
+def test_calibration_curve_rejects_nonfinite_inputs() -> None:
+    # NaN/inf predictions and outcomes must be caught by the range check
+    # (0.0 <= p <= 1.0 always returns False for non-finite values).
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="Predicted probability must be in"):
+            calibration_curve([bad], [1.0], bins=1)
+        with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
+            calibration_curve([0.5], [bad], bins=1)
