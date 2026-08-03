@@ -9,8 +9,8 @@ from typing import TypedDict
 __all__ = [
     "CalibrationBin",
     "brier_score",
-    "log_loss",
     "calibration_curve",
+    "log_loss",
 ]
 
 

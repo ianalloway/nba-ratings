@@ -5,10 +5,10 @@ from __future__ import annotations
 import math
 
 __all__ = [
-    "logistic_win_prob",
     "expected_margin",
-    "update_elo",
+    "logistic_win_prob",
     "mov_multiplier",
+    "update_elo",
     "update_elo_with_margin",
 ]
 

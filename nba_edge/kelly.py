@@ -9,16 +9,16 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 __all__ = [
-    "american_to_implied_prob",
     "american_to_decimal",
+    "american_to_implied_prob",
     "decimal_to_american",
     "decimal_to_implied_prob",
     "implied_prob_to_american",
     "implied_prob_to_decimal",
     "kelly_fraction",
-    "remove_vig",
-    "parlay_odds",
     "kelly_parlay",
+    "parlay_odds",
+    "remove_vig",
 ]
 
 def american_to_implied_prob(american: float) -> float:
