@@ -21,6 +21,7 @@ __all__ = [
     "remove_vig",
 ]
 
+
 def american_to_implied_prob(american: float) -> float:
     """Convert American odds to implied probability."""
     if not math.isfinite(american):
