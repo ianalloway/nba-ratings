@@ -4,6 +4,14 @@ from __future__ import annotations
 
 import math
 
+__all__ = [
+    "logistic_win_prob",
+    "expected_margin",
+    "update_elo",
+    "mov_multiplier",
+    "update_elo_with_margin",
+]
+
 # Minimum value for the mov_multiplier denominator. Without this clamp the
 # formula has a pole at elo_diff_winner == -2200 (0.001 * -2200 + 2.2 == 0)
 # and would raise ZeroDivisionError for any more extreme underdog win.
