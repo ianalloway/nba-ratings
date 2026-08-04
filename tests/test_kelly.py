@@ -223,16 +223,17 @@ def test_remove_vig_equal_never_yields_negative_probability() -> None:
     range of valid inputs to confirm no probability ever goes negative
     and both methods always sum to exactly 1.0.
     """
-    candidates = [
-        (-10001, -100),
-        (1000, -1000),
-        (10000, 10000),
-        (-500, 500),
-        (200, -250),
-        (-1100, 1100),
-        (5000, -5000),
-        (+150, -110),
-    ]
+    # Wide geometric sweep from the +/-100 boundary out to extreme longshots,
+    # crossed in both directions (~2.7k pairs) rather than a few hand-picked lines.
+    magnitudes: list[float] = [100.0, 100.01, 1e9]
+    m = 100.0
+    while m <= 1_000_000.0:
+        magnitudes.append(m)
+        m *= 1.5
+    signed = [s * v for v in magnitudes for s in (1.0, -1.0)]
+    candidates = [(a, b) for a in signed for b in signed]
+    assert len(candidates) > 2000
+
     for a, b in candidates:
         pa_prop, pb_prop = remove_vig(a, b, method="proportional")
         pa_eq, pb_eq = remove_vig(a, b, method="equal")

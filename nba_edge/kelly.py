@@ -137,7 +137,10 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
     p_b = american_to_implied_prob(odds_b)
     total = p_a + p_b
 
-    if total <= 0:
+    # Defensive: american_to_implied_prob returns a value strictly inside (0, 1)
+    # for every valid input, so `total` is always > 0. Kept as a guard against
+    # future changes to the conversion helpers.
+    if total <= 0:  # pragma: no cover
         raise ValueError("Combined implied probability must be positive")
 
     if method == "proportional":
@@ -146,7 +149,9 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
         overround = total - 1.0
         fair_a = p_a - (overround / 2.0)
         fair_b = p_b - (overround / 2.0)
-        if fair_a < 0.0 or fair_b < 0.0:
+        # Defensive: fair_a = (p_a - p_b + 1) / 2 and both implieds lie in (0, 1),
+        # so each fair probability is strictly positive and this cannot trigger.
+        if fair_a < 0.0 or fair_b < 0.0:  # pragma: no cover
             raise ValueError(
                 "Equal margin method produced negative probability. Use 'proportional' instead."
             )
