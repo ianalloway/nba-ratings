@@ -5,6 +5,9 @@ __pycache__/
 dist/
 *.egg-info/
 
+# Local runtime state (workspace/runtime artifacts, e.g. solvent-agent)
+.solvent/
+
 # Local secrets and machine-specific config
 .env
 .env.local
