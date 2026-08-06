@@ -104,10 +104,7 @@ def kelly_fraction(
         raise ValueError(f"American odds cannot be between -100 and 100, got {american_odds}")
     if not math.isfinite(fraction):
         raise ValueError(f"fraction must be finite, got {fraction}")
-    if american_odds > 0:
-        b = american_odds / 100.0
-    else:
-        b = 100.0 / abs(american_odds)
+    b = american_odds / 100.0 if american_odds > 0 else 100.0 / abs(american_odds)
     q = 1.0 - win_prob
     full = (b * win_prob - q) / b if b > 0 else 0.0
     val = fraction * full
@@ -145,17 +142,17 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
 
     if method == "proportional":
         return p_a / total, p_b / total
-    else:  # equal (additive)
-        overround = total - 1.0
-        fair_a = p_a - (overround / 2.0)
-        fair_b = p_b - (overround / 2.0)
-        # Defensive: fair_a = (p_a - p_b + 1) / 2 and both implieds lie in (0, 1),
-        # so each fair probability is strictly positive and this cannot trigger.
-        if fair_a < 0.0 or fair_b < 0.0:  # pragma: no cover
-            raise ValueError(
-                "Equal margin method produced negative probability. Use 'proportional' instead."
-            )
-        return fair_a, fair_b
+    # equal (additive)
+    overround = total - 1.0
+    fair_a = p_a - (overround / 2.0)
+    fair_b = p_b - (overround / 2.0)
+    # Defensive: fair_a = (p_a - p_b + 1) / 2 and both implieds lie in (0, 1),
+    # so each fair probability is strictly positive and this cannot trigger.
+    if fair_a < 0.0 or fair_b < 0.0:  # pragma: no cover
+        raise ValueError(
+            "Equal margin method produced negative probability. Use 'proportional' instead."
+        )
+    return fair_a, fair_b
 
 
 def parlay_odds(odds_list: Sequence[float]) -> dict[str, float]:

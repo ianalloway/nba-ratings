@@ -56,11 +56,7 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
         preds = [float(predictions)]
     else:
         preds = [float(p) for p in predictions]
-
-    if isinstance(outcomes, (int, float)):
-        outs = [float(outcomes)]
-    else:
-        outs = [float(o) for o in outcomes]
+    outs = [float(outcomes)] if isinstance(outcomes, (int, float)) else [float(o) for o in outcomes]
 
     if len(preds) != len(outs):
         raise ValueError(
@@ -105,11 +101,7 @@ def log_loss(
         preds = [float(predictions)]
     else:
         preds = [float(p) for p in predictions]
-
-    if isinstance(outcomes, (int, float)):
-        outs = [float(outcomes)]
-    else:
-        outs = [float(o) for o in outcomes]
+    outs = [float(outcomes)] if isinstance(outcomes, (int, float)) else [float(o) for o in outcomes]
 
     if len(preds) != len(outs):
         raise ValueError(

@@ -34,7 +34,7 @@ def test_brier_score_multiple() -> None:
 
 
 def test_brier_score_invalid() -> None:
-    with pytest.raises(ValueError, match="Lengths.*must match"):
+    with pytest.raises(ValueError, match=r"Lengths.*must match"):
         brier_score([0.5, 0.6], [1.0])
 
     with pytest.raises(ValueError, match="cannot be empty"):
@@ -68,7 +68,7 @@ def test_log_loss_multiple() -> None:
 
 
 def test_log_loss_invalid() -> None:
-    with pytest.raises(ValueError, match="Lengths.*must match"):
+    with pytest.raises(ValueError, match=r"Lengths.*must match"):
         log_loss([0.5, 0.6], [1.0])
 
     with pytest.raises(ValueError, match="cannot be empty"):
@@ -205,7 +205,7 @@ def test_calibration_curve_validation() -> None:
     with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
         calibration_curve([0.5], [1.0], bins=0)
 
-    with pytest.raises(ValueError, match="Lengths.*must match"):
+    with pytest.raises(ValueError, match=r"Lengths.*must match"):
         calibration_curve([0.5, 0.6], [1.0])
 
     with pytest.raises(ValueError, match="cannot be empty"):

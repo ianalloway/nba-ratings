@@ -40,7 +40,7 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
     ``margin_per_elo`` rather than trusting the built-in default.
 
     Args:
-        rating_diff: ``rating_home − rating_away``. Positive → home favored.
+        rating_diff: ``rating_home - rating_away``. Positive → home favored.
         margin_per_elo: Points of predicted margin per Elo point of difference.
             A non-negative value keeps the sign tied to ``rating_diff``.
             Zero collapses the mapping to 0 margin for any diff.

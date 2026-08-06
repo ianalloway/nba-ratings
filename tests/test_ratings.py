@@ -77,7 +77,7 @@ def test_update_elo_draw_moves_both_halfway_to_expected() -> None:
 
 
 def test_update_elo_rejects_invalid_score() -> None:
-    with pytest.raises(ValueError, match="score_a must be 0, 0.5, or 1"):
+    with pytest.raises(ValueError, match=r"score_a must be 0, 0\.5, or 1"):
         update_elo(1500.0, 1500.0, 0.3)
 
 
@@ -138,7 +138,7 @@ def test_update_elo_with_margin_rejects_negative_margin() -> None:
 
 
 def test_update_elo_with_margin_rejects_invalid_score() -> None:
-    with pytest.raises(ValueError, match="score_a must be 0, 0.5, or 1"):
+    with pytest.raises(ValueError, match=r"score_a must be 0, 0\.5, or 1"):
         update_elo_with_margin(1500.0, 1450.0, 0.3, 10.0)
 
 
