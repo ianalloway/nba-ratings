@@ -74,9 +74,13 @@ def implied_prob_to_american(prob: float) -> float:
 
 
 def implied_prob_to_decimal(prob: float) -> float:
-    """Convert implied probability to decimal odds."""
+    """Convert implied probability to decimal odds.
+
+    Accepts ``(0, 1]`` (inclusive upper bound). Unlike
+    ``implied_prob_to_american``, ``prob=1.0`` is valid and returns ``1.0``.
+    """
     if not (0.0 < prob <= 1.0):
-        raise ValueError(f"Probability must be strictly between 0 and 1, got {prob}")
+        raise ValueError(f"Probability must be in (0, 1], got {prob}")
     return 1.0 / prob
 
 

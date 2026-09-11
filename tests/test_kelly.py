@@ -393,6 +393,10 @@ def test_implied_american_round_trip() -> None:
 def test_implied_prob_to_decimal_accepts_unit() -> None:
     # Upper bound is inclusive (1.0 -> 1.0), unlike implied_prob_to_american (strict < 1.0)
     assert pytest.approx(implied_prob_to_decimal(1.0)) == 1.0
+    with pytest.raises(ValueError, match=r"\(0, 1\]"):
+        implied_prob_to_decimal(0.0)
+    with pytest.raises(ValueError, match=r"\(0, 1\]"):
+        implied_prob_to_decimal(1.1)
 
 
 def test_parlay_odds_internal_consistency() -> None:

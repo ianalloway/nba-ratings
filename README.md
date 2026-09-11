@@ -3,13 +3,15 @@
 > Published to PyPI as [`nba-edge`](https://pypi.org/project/nba-edge/).
 
 [![CI](https://github.com/ianalloway/nba-ratings/actions/workflows/ci.yml/badge.svg)](https://github.com/ianalloway/nba-ratings/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/nba-edge.svg)](https://pypi.org/project/nba-edge/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nba-edge.svg)](https://pypi.org/project/nba-edge/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Reusable Elo, win-probability, and Kelly-sizing primitives for NBA-style models.
+Reusable Elo, win-probability, and Kelly-sizing primitives for NBA-style moneylines.
 
 ## Why This Repo Matters
 
-This is the library layer of the sports ML stack:
+Installable library layer for the sports ML stack:
 
 - reusable rating logic instead of notebook snippets
 - portable win-probability helpers for downstream services
@@ -33,7 +35,9 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 pip install nba-edge
 ```
 
-The library has zero runtime dependencies (see `pyproject.toml`). The
+Package page: [pypi.org/project/nba-edge/](https://pypi.org/project/nba-edge/).
+
+The library has **zero runtime dependencies** (see `pyproject.toml`). The
 root-level `requirements.txt` is unrelated to the library — it only exists so
 Streamlit Community Cloud can find the demo app's dependencies
 (`demo/requirements.txt`, i.e. `streamlit` + `pandas`).
