@@ -1,5 +1,6 @@
 """Installable primitives for NBA-style edge models."""
 
+from nba_edge.clv import RollingClvSummary, clv_edge, rolling_clv
 from nba_edge.kelly import (
     american_to_decimal,
     american_to_implied_prob,
@@ -23,10 +24,12 @@ from nba_edge.ratings import (
 
 __all__ = [
     "CalibrationBin",
+    "RollingClvSummary",
     "american_to_decimal",
     "american_to_implied_prob",
     "brier_score",
     "calibration_curve",
+    "clv_edge",
     "decimal_to_american",
     "decimal_to_implied_prob",
     "expected_margin",
@@ -39,6 +42,7 @@ __all__ = [
     "mov_multiplier",
     "parlay_odds",
     "remove_vig",
+    "rolling_clv",
     "update_elo",
     "update_elo_with_margin",
 ]
