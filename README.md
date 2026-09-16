@@ -27,6 +27,7 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 - Kelly fraction sizing & multi-leg parlay sizing
 - Bidirectional odds format conversions (American, Decimal, Implied Probability)
 - Bookmaker vig-removal tools (Proportional and Equal Margin methods)
+- Closing-line value helpers (`clv_edge`, `rolling_clv`) for beat-the-close streaks
 - Model evaluation metrics (Brier Score, Log Loss, Calibration Curve)
 
 ## Install
@@ -56,6 +57,8 @@ from nba_edge import (
     remove_vig,
     parlay_odds,
     kelly_parlay,
+    clv_edge,
+    rolling_clv,
     brier_score,
     calibration_curve,
     log_loss,
@@ -79,12 +82,41 @@ parlay = parlay_odds([-110, +130])
 # Parlay Kelly sizing (fraction = 0.25 for quarter-Kelly)
 parlay_stake = kelly_parlay([0.60, 0.55], [-110, +130], fraction=0.25)
 
-# 4. Model evaluation
+# 4. Closing-line value (beat the close)
+edge = clv_edge(-110, -120)  # +pp when open beat close
+clv = rolling_clv([-110, -105, +140], [-115, -100, +130], window=2)
+# clv["hit_rate"], clv["mean_clv"], clv["current_streak"]
+
+# 5. Model evaluation
 predictions = [0.75, 0.40, 0.65]
 outcomes = [1.0, 0.0, 1.0]
 bs = brier_score(predictions, outcomes)
 ll = log_loss(predictions, outcomes)
 curve = calibration_curve(predictions, outcomes, bins=10)
+```
+
+### Rolling CLV
+
+Track whether your ticket prices beat the close — the market-aware cousin of
+raw win rate. `clv_edge` returns probability-point CLV
+(`implied(close) - implied(open)`); `rolling_clv` turns a sequence of
+open/close American odds (or precomputed edges) into hit rate, mean CLV, and
+the current beat/miss streak:
+
+```python
+from nba_edge import clv_edge, rolling_clv
+
+assert clv_edge(-110, -120) > 0  # got a better number than close
+
+summary = rolling_clv(
+    [-110, -105, +140, -108],
+    [-115, -100, +130, -112],
+    window=3,
+)
+summary["hit_rate"]         # fraction of bets that beat the close
+summary["mean_clv"]         # average CLV in probability points
+summary["current_streak"]   # +n trailing beats, -n trailing misses
+summary["rolling_hit_rate"] # per-bet hit rate over the trailing window
 ```
 
 ### Margin-of-victory Elo
