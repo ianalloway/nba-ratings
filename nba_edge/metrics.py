@@ -156,7 +156,7 @@ def calibration_curve(
         #   'mean_predicted': 0.7, 'mean_actual': 1.0, 'count': 1}]
 
     """
-    if not math.isfinite(bins) or bins < 1:
+    if not isinstance(bins, int) or isinstance(bins, bool) or bins < 1:
         raise ValueError(f"bins must be a finite integer >= 1, got {bins}")
 
     preds = [float(p) for p in predictions]

@@ -13,6 +13,7 @@ __all__ = [
     "american_to_implied_prob",
     "decimal_to_american",
     "decimal_to_implied_prob",
+    "fair_american_odds",
     "implied_prob_to_american",
     "implied_prob_to_decimal",
     "kelly_fraction",
@@ -106,8 +107,8 @@ def kelly_fraction(
         raise ValueError(f"American odds must be finite, got {american_odds}")
     if -100 < american_odds < 100:
         raise ValueError(f"American odds cannot be between -100 and 100, got {american_odds}")
-    if not math.isfinite(fraction):
-        raise ValueError(f"fraction must be finite, got {fraction}")
+    if not math.isfinite(fraction) or fraction < 0.0:
+        raise ValueError(f"fraction must be a finite value >= 0, got {fraction}")
     b = american_odds / 100.0 if american_odds > 0 else 100.0 / abs(american_odds)
     q = 1.0 - win_prob
     full = (b * win_prob - q) / b if b > 0 else 0.0
@@ -157,6 +158,30 @@ def remove_vig(odds_a: float, odds_b: float, method: str = "proportional") -> tu
             "Equal margin method produced negative probability. Use 'proportional' instead."
         )
     return fair_a, fair_b
+
+
+def fair_american_odds(
+    odds_a: float, odds_b: float, method: str = "proportional"
+) -> tuple[float, float]:
+    """Return no-vig American odds for a two-way market.
+
+    Strips bookmaker margin via :func:`remove_vig`, then converts the fair
+    probabilities back to American odds. Round-tripping the result through
+    :func:`american_to_implied_prob` recovers probabilities that sum to 1.0
+    (within float tolerance).
+
+    Args:
+        odds_a: American odds for outcome A.
+        odds_b: American odds for outcome B.
+        method: Vig-removal method forwarded to :func:`remove_vig`
+            (``'proportional'`` or ``'equal'``).
+
+    Returns:
+        A tuple of fair American odds ``(american_a, american_b)``.
+
+    """
+    fair_a, fair_b = remove_vig(odds_a, odds_b, method=method)
+    return implied_prob_to_american(fair_a), implied_prob_to_american(fair_b)
 
 
 def parlay_odds(odds_list: Sequence[float]) -> dict[str, float]:
@@ -219,8 +244,8 @@ def kelly_parlay(
         )
     if not win_probs:
         raise ValueError("Input lists cannot be empty")
-    if not math.isfinite(fraction):
-        raise ValueError(f"fraction must be finite, got {fraction}")
+    if not math.isfinite(fraction) or fraction < 0.0:
+        raise ValueError(f"fraction must be a finite value >= 0, got {fraction}")
 
     # Combined win probability (assuming independence)
     joint_prob = 1.0

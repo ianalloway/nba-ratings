@@ -5,6 +5,7 @@ from nba_edge.kelly import (
     american_to_implied_prob,
     decimal_to_american,
     decimal_to_implied_prob,
+    fair_american_odds,
     implied_prob_to_american,
     implied_prob_to_decimal,
     kelly_fraction,
@@ -452,6 +453,40 @@ def test_remove_vig_conserves_total_probability() -> None:
         assert 0.0 <= pa_eq <= 1.0 and 0.0 <= pb_eq <= 1.0
 
 
+def test_fair_american_odds_round_trips_to_unit_implied() -> None:
+    """fair_american_odds must strip vig such that converting the returned
+    American prices back to implied probability yields a distribution that
+    sums to 1.0 (no residual overround).
+    """
+    markets = [(-110, -110), (-150, 130), (200, -250), (-1000, 800)]
+    for a, b in markets:
+        fa, fb = fair_american_odds(a, b, method="proportional")
+        pa = american_to_implied_prob(fa)
+        pb = american_to_implied_prob(fb)
+        assert pa + pb == pytest.approx(1.0)
+        # Fair favorites stay favorites (sign preserved for heavy sides).
+        assert fa != 0.0 and fb != 0.0
+
+    # Equal method also lands on a no-vig American pair.
+    fa, fb = fair_american_odds(-110, -110, method="equal")
+    assert american_to_implied_prob(fa) + american_to_implied_prob(fb) == pytest.approx(1.0)
+    # Symmetric market → even money either side after de-vig.
+    assert fa == pytest.approx(-100.0)
+    assert fb == pytest.approx(-100.0)
+
+
+def test_fair_american_odds_matches_remove_vig_then_convert() -> None:
+    fair_p = remove_vig(-150, 130, method="proportional")
+    fair_am = fair_american_odds(-150, 130, method="proportional")
+    assert fair_am[0] == pytest.approx(implied_prob_to_american(fair_p[0]))
+    assert fair_am[1] == pytest.approx(implied_prob_to_american(fair_p[1]))
+
+
+def test_fair_american_odds_rejects_bad_method() -> None:
+    with pytest.raises(ValueError, match="Unsupported method"):
+        fair_american_odds(-110, -110, method="invalid")
+
+
 def test_remove_vig_zero_vig_market_is_identity() -> None:
     # A market with no overround (+100 / -100 => implied 0.5 / 0.5) already
     # holds fair probabilities; both methods must return them unchanged, and
@@ -506,8 +541,20 @@ def test_kelly_fraction_rejects_nonfinite_american_odds() -> None:
 def test_kelly_fraction_rejects_nonfinite_fraction() -> None:
     """Non-finite fraction must raise rather than propagating NaN downstream."""
     for bad in (float("nan"), float("inf"), float("-inf")):
-        with pytest.raises(ValueError, match="fraction must be finite"):
+        with pytest.raises(ValueError, match="fraction must be a finite value >= 0"):
             kelly_fraction(0.6, 100, fraction=bad, max_cap=None)
+
+
+def test_kelly_fraction_rejects_negative_fraction() -> None:
+    """Negative fraction flipped the sign of a losing-edge Kelly and returned a
+    positive stake (sizing a negative-EV bet). Reject fraction < 0 instead.
+    """
+    with pytest.raises(ValueError, match="fraction must be a finite value >= 0"):
+        kelly_fraction(0.4, 100, fraction=-1.0, max_cap=None)
+    with pytest.raises(ValueError, match="fraction must be a finite value >= 0"):
+        kelly_fraction(0.6, 100, fraction=-0.25)
+    # Zero fraction is valid and always sizes to 0.
+    assert kelly_fraction(0.9, 100, fraction=0.0, max_cap=None) == 0.0
 
 
 def test_kelly_fraction_rejects_nonfinite_max_cap() -> None:
@@ -520,8 +567,17 @@ def test_kelly_fraction_rejects_nonfinite_max_cap() -> None:
 def test_kelly_parlay_rejects_nonfinite_fraction() -> None:
     """Non-finite fraction must raise rather than propagating NaN downstream."""
     for bad in (float("nan"), float("inf"), float("-inf")):
-        with pytest.raises(ValueError, match="fraction must be finite"):
+        with pytest.raises(ValueError, match="fraction must be a finite value >= 0"):
             kelly_parlay([0.6, 0.7], [-110, -110], fraction=bad, max_cap=None)
+
+
+def test_kelly_parlay_rejects_negative_fraction() -> None:
+    """Same sign-flip bug as kelly_fraction: negative fraction on a losing
+    parlay must not produce a positive stake.
+    """
+    with pytest.raises(ValueError, match="fraction must be a finite value >= 0"):
+        kelly_parlay([0.4, 0.4], [-110, -110], fraction=-1.0, max_cap=None)
+    assert kelly_parlay([0.9, 0.9], [-110, -110], fraction=0.0, max_cap=None) == 0.0
 
 
 def test_kelly_parlay_rejects_nonfinite_max_cap() -> None:
