@@ -219,13 +219,21 @@ def test_calibration_curve_validation() -> None:
 
 
 def test_calibration_curve_rejects_nonfinite_bins() -> None:
-    # Every other numeric-parameter function in nba_edge guards against
-    # non-finite inputs (math.isfinite); calibration_curve must too, so a
-    # NaN/inf bin count raises a clean ValueError instead of crashing
-    # range()/division with a confusing TypeError.
-    for bad in (float("nan"), float("inf"), float("-inf")):
+    # Non-integer / non-finite bin counts must raise ValueError (not TypeError
+    # from range()), matching rolling_clv's window validation.
+    for bad in (float("nan"), float("inf"), float("-inf"), 2.5, 10.0):
         with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
             calibration_curve([0.5], [1.0], bins=bad)  # type: ignore[arg-type]
+
+
+def test_calibration_curve_rejects_bool_bins() -> None:
+    # bool is a subclass of int; without an explicit guard, bins=True silently
+    # became a single bin. Reject bools the same way rolling_clv rejects
+    # window=True.
+    with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
+        calibration_curve([0.5], [1.0], bins=True)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="bins must be a finite integer >= 1"):
+        calibration_curve([0.5], [1.0], bins=False)  # type: ignore[arg-type]
 
 
 def test_brier_score_rejects_nonfinite_inputs() -> None:

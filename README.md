@@ -26,8 +26,8 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 - Logistic win probability
 - Kelly fraction sizing & multi-leg parlay sizing
 - Bidirectional odds format conversions (American, Decimal, Implied Probability)
-- Bookmaker vig-removal tools (Proportional and Equal Margin methods)
-- Closing-line value helpers (`clv_edge`, `rolling_clv`) for beat-the-close streaks
+- Bookmaker vig-removal tools (Proportional and Equal Margin methods) plus `fair_american_odds`
+- Closing-line value helpers (`clv_edge`, `clv_pts`, `rolling_clv`, `clv_book_summary`) for beat-the-close streaks
 - Model evaluation metrics (Brier Score, Log Loss, Calibration Curve)
 
 ## Install
@@ -99,14 +99,17 @@ curve = calibration_curve(predictions, outcomes, bins=10)
 
 Track whether your ticket prices beat the close — the market-aware cousin of
 raw win rate. `clv_edge` returns probability-point CLV
-(`implied(close) - implied(open)`); `rolling_clv` turns a sequence of
+(`implied(close) - implied(open)`); `clv_pts` scales that by 100 to match the
+ai-advantage `clvPts` display units. `rolling_clv` turns a sequence of
 open/close American odds (or precomputed edges) into hit rate, mean CLV, and
-the current beat/miss streak:
+the current beat/miss streak; `clv_book_summary` adds beat/miss/push counts
+with the same `0.05` pts push band as ai-advantage:
 
 ```python
-from nba_edge import clv_edge, rolling_clv
+from nba_edge import clv_edge, clv_pts, clv_book_summary, rolling_clv
 
 assert clv_edge(-110, -120) > 0  # got a better number than close
+assert clv_pts(-110, -120) == clv_edge(-110, -120) * 100
 
 summary = rolling_clv(
     [-110, -105, +140, -108],
@@ -117,6 +120,13 @@ summary["hit_rate"]         # fraction of bets that beat the close
 summary["mean_clv"]         # average CLV in probability points
 summary["current_streak"]   # +n trailing beats, -n trailing misses
 summary["rolling_hit_rate"] # per-bet hit rate over the trailing window
+
+book = clv_book_summary(
+    [-110, -105, +140, -108],
+    [-115, -100, +130, -112],
+)
+book["mean_clv_pts"]  # average CLV in percentage points
+book["beats"], book["misses"], book["pushes"]
 ```
 
 ### Margin-of-victory Elo
