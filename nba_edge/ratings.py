@@ -3,9 +3,18 @@
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
+
+from nba_edge.rest import rest_spread_adjustment
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from nba_edge.rest import FatigueFeatures
 
 __all__ = [
     "expected_margin",
+    "expected_margin_with_rest",
     "logistic_win_prob",
     "mov_multiplier",
     "update_elo",
@@ -31,7 +40,12 @@ def logistic_win_prob(rating_diff: float, scale: float = 400.0) -> float:
         return 0.0 if rating_diff < 0 else 1.0
 
 
-def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
+def expected_margin(
+    rating_diff: float,
+    margin_per_elo: float = 0.025,
+    *,
+    rest_points: float = 0.0,
+) -> float:
     """Linear toy mapping from an Elo difference to a predicted point margin.
 
     The default slope (0.025) maps a 40-point gap to a 1-point spread.
@@ -39,11 +53,19 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
     should pipe NBA-specific margin-per-Elo estimates into
     ``margin_per_elo`` rather than trusting the built-in default.
 
+    Rest / schedule-density is **off by default**: ``rest_points`` is 0.0 so
+    existing callers see unchanged output. Pass a precomputed adjustment from
+    :func:`nba_edge.rest.rest_spread_adjustment`, or use
+    :func:`expected_margin_with_rest` to compute it inline.
+
     Args:
         rating_diff: ``rating_home - rating_away``. Positive → home favored.
         margin_per_elo: Points of predicted margin per Elo point of difference.
             A non-negative value keeps the sign tied to ``rating_diff``.
             Zero collapses the mapping to 0 margin for any diff.
+        rest_points: Optional points added to the margin for rest / travel
+            (home perspective). Default ``0.0`` leaves the Elo-only mapping
+            unchanged.
 
     Returns:
         Predicted point margin (positive = home favored, negative = away).
@@ -55,7 +77,38 @@ def expected_margin(rating_diff: float, margin_per_elo: float = 0.025) -> float:
         raise ValueError(f"margin_per_elo must be finite, got {margin_per_elo!r}")
     if margin_per_elo < 0:
         raise ValueError(f"margin_per_elo must be non-negative, got {margin_per_elo}")
-    return rating_diff * margin_per_elo
+    if not math.isfinite(rest_points):
+        raise ValueError(f"rest_points must be finite, got {rest_points!r}")
+    return rating_diff * margin_per_elo + rest_points
+
+
+def expected_margin_with_rest(
+    rating_diff: float,
+    home_fatigue: FatigueFeatures,
+    away_fatigue: FatigueFeatures,
+    *,
+    margin_per_elo: float = 0.025,
+    rest_coeffs: Mapping[str, float] | None = None,
+) -> float:
+    """``expected_margin`` plus a home-perspective rest / density adjustment.
+
+    Convenience wrapper around :func:`expected_margin` and
+    :func:`nba_edge.rest.rest_spread_adjustment`. Prefer calling
+    :func:`expected_margin` alone when you do not want rest effects (the
+    default prediction path).
+
+    Args:
+        rating_diff: ``rating_home - rating_away``.
+        home_fatigue: Features for the home side (from
+            :func:`nba_edge.rest.compute_fatigue_features`).
+        away_fatigue: Features for the away side.
+        margin_per_elo: Elo-to-points slope (same as :func:`expected_margin`).
+        rest_coeffs: Optional overrides for
+            :data:`nba_edge.rest.DEFAULT_REST_COEFFS`.
+
+    """
+    adj = rest_spread_adjustment(home_fatigue, away_fatigue, coeffs=rest_coeffs)
+    return expected_margin(rating_diff, margin_per_elo, rest_points=adj)
 
 
 def update_elo(

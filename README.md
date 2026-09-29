@@ -24,6 +24,7 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 
 - Elo updates, including a margin-of-victory-weighted variant
 - Logistic win probability
+- Optional rest / schedule-density adjustment for point spreads
 - Kelly fraction sizing & multi-leg parlay sizing
 - Bidirectional odds format conversions (American, Decimal, Implied Probability)
 - Bookmaker vig-removal tools (Proportional and Equal Margin methods) plus `fair_american_odds`
@@ -50,7 +51,10 @@ from nba_edge import (
     logistic_win_prob,
     update_elo,
     expected_margin,
+    expected_margin_with_rest,
     mov_multiplier,
+    compute_fatigue_features,
+    rest_spread_adjustment,
     kelly_fraction,
     american_to_decimal,
     american_to_implied_prob,
@@ -143,6 +147,63 @@ predicted_spread = expected_margin(rating_diff=120)  # toy mapping
 mov_factor = mov_multiplier(margin=22, elo_diff_winner=120)  # weighting factor
 new_h, new_a = update_elo_with_margin(1600, 1580, 1.0, margin=22)
 ```
+
+### Rest and schedule density
+
+NBA schedules create uneven rest: back-to-backs, 3-in-4s, long road trips, and
+cross-country travel. `compute_fatigue_features` turns one team's ordered
+schedule into per-game flags and counts; `rest_spread_adjustment` maps home vs
+away features into points on the spread using documented toy defaults
+(`DEFAULT_REST_COEFFS`) that you can override.
+
+Rest is **opt-in** on the prediction path. `expected_margin(...)` is unchanged
+unless you pass `rest_points`, or call `expected_margin_with_rest`:
+
+```python
+from nba_edge import (
+    DEFAULT_REST_COEFFS,
+    compute_fatigue_features,
+    expected_margin,
+    expected_margin_with_rest,
+    rest_spread_adjustment,
+)
+
+home_sked = [
+    {"date": "2025-11-01", "location": "home"},
+    {"date": "2025-11-05", "location": "home"},  # 3 days rest
+]
+away_sked = [
+    {"date": "2025-11-04", "location": "away"},
+    {
+        "date": "2025-11-05",
+        "location": "away",  # back-to-back
+        "arena_lat": 34.043,
+        "arena_lon": -118.267,
+    },
+]
+# Optional: prior away game coords → haversine travel_miles on the B2B night
+away_sked[0]["arena_lat"] = 40.7505
+away_sked[0]["arena_lon"] = -73.9934
+
+home_fatigue = compute_fatigue_features(home_sked)[-1]
+away_fatigue = compute_fatigue_features(away_sked)[-1]
+
+adj = rest_spread_adjustment(home_fatigue, away_fatigue)
+# Or override a single coefficient:
+adj = rest_spread_adjustment(
+    home_fatigue, away_fatigue, coeffs={**DEFAULT_REST_COEFFS, "back_to_back": 2.0}
+)
+
+# Elo-only (default) vs Elo + rest
+elo_only = expected_margin(rating_diff=80)  # rest_points defaults to 0
+with_rest = expected_margin_with_rest(80, home_fatigue, away_fatigue)
+assert with_rest == expected_margin(80, rest_points=adj)
+```
+
+Feature conventions: season opener → `days_rest is None` (treated as fully
+rested); neutral sites continue a road trip (only `home` resets it); travel
+miles come from an explicit `travel_miles` field or haversine between consecutive
+`arena_lat` / `arena_lon` values.
 
 ## Publish
 

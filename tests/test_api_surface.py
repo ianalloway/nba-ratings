@@ -31,7 +31,11 @@ def test_every_exported_name_is_importable_and_comes_from_package() -> None:
     for name in nba_edge.__all__:
         obj = getattr(nba_edge, name, None)
         assert obj is not None, f"{name} listed in __all__ but not importable"
-        module = getattr(obj, "__module__", "")
+        module = getattr(obj, "__module__", None)
+        if module is None:
+            # Plain constants (e.g. dicts like DEFAULT_REST_COEFFS) have no
+            # __module__; importability alone is the contract for those.
+            continue
         assert module.startswith("nba_edge"), (
             f"{name} is exported but originates from {module!r}, not nba_edge"
         )
