@@ -5,6 +5,8 @@ loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-29
+
 ### Added
 
 - **Rest / schedule-density** module `nba_edge.rest`:
@@ -17,6 +19,12 @@ loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     so rest can optionally adjust the Elo→spread mapping; default remains
     Elo-only (no behavior change for existing callers).
   - TypedDicts: `ScheduleGame`, `FatigueFeatures`, `RestAdjustmentCoeffs`.
+
+### Maintenance
+
+- New `publish.yml` workflow publishes `nba-edge` to PyPI via Trusted
+  Publishing (OIDC, no API token) on GitHub release (`published`) or manual
+  dispatch.
 
 ## [0.2.0] - 2026-09-29
 
