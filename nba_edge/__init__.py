@@ -58,4 +58,4 @@ __all__ = [
     "update_elo",
     "update_elo_with_margin",
 ]
-__version__ = "0.1.1"
+__version__ = "0.2.0"
