@@ -5,6 +5,19 @@ loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Rest / schedule-density** module `nba_edge.rest`:
+  - `compute_fatigue_features(schedule)`: per-game days of rest, back-to-back,
+    3-in-4, 4-in-6, road-trip length, and optional travel miles (explicit or
+    haversine from arena coordinates).
+  - `haversine_miles(...)` and `rest_spread_adjustment(...)` with documented
+    `DEFAULT_REST_COEFFS` that callers can override.
+  - `expected_margin(..., rest_points=0.0)` and `expected_margin_with_rest(...)`
+    so rest can optionally adjust the Elo→spread mapping; default remains
+    Elo-only (no behavior change for existing callers).
+  - TypedDicts: `ScheduleGame`, `FatigueFeatures`, `RestAdjustmentCoeffs`.
+
 ## [0.2.0] - 2026-09-29
 
 First release since `0.1.0`. `main` briefly declared `0.1.1` (#31), but that

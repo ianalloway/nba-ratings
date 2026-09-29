@@ -22,6 +22,11 @@ def test_expected_margin_custom_slope() -> None:
     assert expected_margin(100.0) == pytest.approx(2.5)
 
 
+def test_expected_margin_rejects_nonfinite_rest_points() -> None:
+    with pytest.raises(ValueError, match="rest_points must be finite"):
+        expected_margin(100.0, rest_points=float("nan"))
+
+
 def test_logistic_win_prob_symmetry() -> None:
     for diff in (-300.0, -50.0, 0.0, 50.0, 300.0):
         p_home = logistic_win_prob(diff)
