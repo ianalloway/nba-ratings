@@ -29,3 +29,6 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Verify clean install from PyPI
+        run: bash scripts/smoke-registry.sh

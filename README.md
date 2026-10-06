@@ -34,10 +34,15 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 ## Install
 
 ```bash
-pip install nba-edge
+pip install nba-edge  # Published registry version (currently 0.1.0)
+
+# To use the v0.3.0 examples while the PyPI release is pending:
+pip install "nba-edge @ git+https://github.com/ianalloway/nba-ratings.git@v0.3.0"
 ```
 
 Package page: [pypi.org/project/nba-edge/](https://pypi.org/project/nba-edge/).
+The examples below use features introduced in v0.3.0. Once that version appears
+on PyPI, you can install it with `pip install "nba-edge>=0.3.0,<0.4"`.
 
 The library has **zero runtime dependencies** (see `pyproject.toml`). The
 root-level `requirements.txt` is unrelated to the library — it only exists so
@@ -207,11 +212,11 @@ miles come from an explicit `travel_miles` field or haversine between consecutiv
 
 ## Publish
 
-```bash
-pip install build twine
-python -m build
-twine upload dist/*
-```
+GitHub releases publish through [`.github/workflows/publish.yml`](.github/workflows/publish.yml)
+using PyPI Trusted Publishing. The PyPI publisher must match GitHub owner
+`ianalloway`, repository `nba-ratings`, and workflow filename `publish.yml`.
+If the publisher specifies a GitHub environment, the publish job must use that
+same environment. The workflow verifies a clean PyPI install after upload.
 
 ## Non-goals
 
