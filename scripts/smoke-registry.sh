@@ -3,7 +3,11 @@ set -euo pipefail
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 python_bin="${PYTHON_BIN:-python3}"
-version="$("$python_bin" -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('${repo_dir}/pyproject.toml').read_text())['project']['version'])")"
+version="$(sed -nE 's/^version = "([^"]+)"$/\1/p' "$repo_dir/pyproject.toml")"
+if [[ -z "$version" ]]; then
+  echo "Could not read project version from pyproject.toml" >&2
+  exit 1
+fi
 spec="${1:-nba-edge==${version}}"
 smoke_dir="$(mktemp -d)"
 trap 'rm -rf "$smoke_dir"' EXIT
