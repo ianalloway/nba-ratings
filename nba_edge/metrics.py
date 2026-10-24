@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from bisect import bisect_right
 from collections.abc import Iterable
 from typing import TypedDict
 
@@ -151,8 +152,10 @@ def calibration_curve(
         curve = calibration_curve([0.6, 0.7, 0.4, 0.55], [1.0, 1.0, 0.0, 1.0])
         # [{'bin_low': 0.4, 'bin_high': 0.5, 'mean_predicted': 0.4, 'mean_actual': 0.0, 'count': 1},
         #  {'bin_low': 0.5, 'bin_high': 0.6,
-        #   'mean_predicted': 0.575, 'mean_actual': 1.0, 'count': 2},
+        #   'mean_predicted': 0.55, 'mean_actual': 1.0, 'count': 1},
         #  {'bin_low': 0.6, 'bin_high': 0.7,
+        #   'mean_predicted': 0.6, 'mean_actual': 1.0, 'count': 1},
+        #  {'bin_low': 0.7, 'bin_high': 0.8,
         #   'mean_predicted': 0.7, 'mean_actual': 1.0, 'count': 1}]
 
     """
@@ -176,13 +179,15 @@ def calibration_curve(
         if o not in (0.0, 1.0):
             raise ValueError(f"Outcome must be 0 or 1, got {o}")
 
-    width = 1.0 / bins
+    boundaries = [i / bins for i in range(bins + 1)]
     # bucket[i] holds (sum_predicted, sum_actual, count) for bin i
     buckets: list[list[float]] = [[0.0, 0.0, 0.0] for _ in range(bins)]
 
     for p, o in zip(preds, outs, strict=True):
-        # Edge case: p == 1.0 goes into the last bin
-        idx = min(int(p / width), bins - 1)
+        # Compare against the actual boundaries: division by width can put
+        # values such as 0.6 into the preceding bin due to float rounding.
+        # bisect_right preserves the inclusive lower bound; 1.0 stays last.
+        idx = min(bisect_right(boundaries, p) - 1, bins - 1)
         buckets[idx][0] += p
         buckets[idx][1] += o
         buckets[idx][2] += 1.0
@@ -193,8 +198,8 @@ def calibration_curve(
             continue
         result.append(
             CalibrationBin(
-                bin_low=round(i * width, 10),
-                bin_high=round((i + 1) * width, 10),
+                bin_low=round(boundaries[i], 10),
+                bin_high=round(boundaries[i + 1], 10),
                 mean_predicted=round(sum_p / count, 10),
                 mean_actual=round(sum_o / count, 10),
                 count=int(count),

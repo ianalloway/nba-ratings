@@ -172,6 +172,21 @@ def test_calibration_curve_p1_lands_in_last_bin() -> None:
     assert curve[0]["count"] == 2
 
 
+@pytest.mark.parametrize("bins", [3, 10, 100])
+def test_calibration_exact_boundaries_start_the_next_bin(bins: int) -> None:
+    predictions = [i / bins for i in range(bins)]
+    curve = calibration_curve(predictions, [1.0] * bins, bins=bins)
+    assert len(curve) == bins
+    assert [entry["count"] for entry in curve] == [1] * bins
+    assert [entry["bin_low"] for entry in curve] == [round(p, 10) for p in predictions]
+
+
+def test_calibration_values_below_boundary_stay_in_previous_bin() -> None:
+    below = math.nextafter(0.6, 0.0)
+    curve = calibration_curve([below, 0.6], [0.0, 1.0])
+    assert [(entry["bin_low"], entry["count"]) for entry in curve] == [(0.5, 1), (0.6, 1)]
+
+
 def test_calibration_curve_empty_bins_omitted() -> None:
     # All predictions in one bin → only one entry returned
     curve = calibration_curve([0.55, 0.58], [1.0, 0.0], bins=10)
