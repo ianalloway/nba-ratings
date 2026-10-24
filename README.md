@@ -104,6 +104,10 @@ ll = log_loss(predictions, outcomes)
 curve = calibration_curve(predictions, outcomes, bins=10)
 ```
 
+Calibration bins include their lower boundary and exclude their upper boundary:
+with 10 bins, a prediction of `0.6` belongs in `[0.6, 0.7)`. A prediction of `1.0`
+belongs in the final bin. Empty bins are omitted from the returned records.
+
 ### Rolling CLV
 
 Track whether your ticket prices beat the close — the market-aware cousin of
