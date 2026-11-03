@@ -34,15 +34,12 @@ Pairs well with [`nba-clv-dashboard`](https://github.com/ianalloway/nba-clv-dash
 ## Install
 
 ```bash
-pip install nba-edge  # Published registry version (currently 0.1.0)
-
-# To use the v0.3.0 examples while the PyPI release is pending:
-pip install "nba-edge @ git+https://github.com/ianalloway/nba-ratings.git@v0.3.0"
+pip install nba-edge
 ```
 
 Package page: [pypi.org/project/nba-edge/](https://pypi.org/project/nba-edge/).
-The examples below use features introduced in v0.3.0. Once that version appears
-on PyPI, you can install it with `pip install "nba-edge>=0.3.0,<0.4"`.
+The examples below use features introduced in v0.3.0; pin with
+`pip install "nba-edge>=0.3.0,<0.4"` if you want to stay on this release line.
 
 The library has **zero runtime dependencies** (see `pyproject.toml`). The
 root-level `requirements.txt` is unrelated to the library — it only exists so
@@ -221,6 +218,12 @@ using PyPI Trusted Publishing. The PyPI publisher must match GitHub owner
 `ianalloway`, repository `nba-ratings`, and workflow filename `publish.yml`.
 If the publisher specifies a GitHub environment, the publish job must use that
 same environment. The workflow verifies a clean PyPI install after upload.
+
+If the run fails with `invalid-publisher`, the trusted publisher is missing on
+PyPI: add it under the `nba-edge` project's *Publishing* settings (owner
+`ianalloway`, repo `nba-ratings`, workflow `publish.yml`, no environment), then
+re-run the workflow with **Run workflow** (`workflow_dispatch`) from `main` or
+the `v0.3.0` tag.
 
 ## Non-goals
 
