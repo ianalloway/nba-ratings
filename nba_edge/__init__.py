@@ -21,7 +21,13 @@ from nba_edge.kelly import (
     parlay_odds,
     remove_vig,
 )
-from nba_edge.metrics import CalibrationBin, brier_score, calibration_curve, log_loss
+from nba_edge.metrics import (
+    CalibrationBin,
+    brier_score,
+    brier_skill_score,
+    calibration_curve,
+    log_loss,
+)
 from nba_edge.ratings import (
     expected_margin,
     expected_margin_with_rest,
@@ -51,6 +57,7 @@ __all__ = [
     "american_to_decimal",
     "american_to_implied_prob",
     "brier_score",
+    "brier_skill_score",
     "calibration_curve",
     "clv_book_summary",
     "clv_edge",
