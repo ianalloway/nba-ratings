@@ -69,6 +69,7 @@ from nba_edge import (
     clv_edge,
     rolling_clv,
     brier_score,
+    brier_skill_score,
     calibration_curve,
     log_loss,
 )
@@ -100,9 +101,15 @@ clv = rolling_clv([-110, -105, +140], [-115, -100, +130], window=2)
 predictions = [0.75, 0.40, 0.65]
 outcomes = [1.0, 0.0, 1.0]
 bs = brier_score(predictions, outcomes)
+skill = brier_skill_score(predictions, outcomes, reference=0.5)
 ll = log_loss(predictions, outcomes)
 curve = calibration_curve(predictions, outcomes, bins=10)
 ```
+
+The Brier skill score measures the reduction in mean squared error relative to a
+reference forecast. A value of `0.54` means the model reduced the error by 54%.
+Pass a single baseline probability or a sequence of reference probabilities in
+the same order as the games.
 
 Calibration bins include their lower boundary and exclude their upper boundary:
 with 10 bins, a prediction of `0.6` belongs in `[0.6, 0.7)`. A prediction of `1.0`

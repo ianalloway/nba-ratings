@@ -10,6 +10,7 @@ from typing import TypedDict
 __all__ = [
     "CalibrationBin",
     "brier_score",
+    "brier_skill_score",
     "calibration_curve",
     "log_loss",
 ]
@@ -76,6 +77,26 @@ def brier_score(predictions: float | Iterable[float], outcomes: float | Iterable
         total_se += (p - o) ** 2
 
     return total_se / len(preds)
+
+
+def brier_skill_score(
+    predictions: Iterable[float],
+    outcomes: Iterable[float],
+    reference: float | Iterable[float],
+) -> float:
+    """Compare two forecasts for the same games using 1 - Brier(model) / Brier(reference).
+
+    The reference may be a constant win probability or one probability per game.
+    A score of 1 is perfect, 0 matches the reference, and negative values favor
+    the reference. A perfect reference makes the ratio undefined.
+    """
+    actual = list(outcomes)
+    model_score = brier_score(predictions, actual)
+    baseline = [reference] * len(actual) if isinstance(reference, (int, float)) else reference
+    reference_score = brier_score(baseline, actual)
+    if reference_score == 0.0:
+        raise ValueError("Brier skill score is undefined for a perfect reference forecast")
+    return 1.0 - model_score / reference_score
 
 
 def log_loss(

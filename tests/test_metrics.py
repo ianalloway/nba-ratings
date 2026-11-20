@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from nba_edge import CalibrationBin
+from nba_edge import CalibrationBin, brier_skill_score
 from nba_edge.metrics import brier_score, calibration_curve, log_loss
 
 
@@ -45,6 +45,22 @@ def test_brier_score_invalid() -> None:
 
     with pytest.raises(ValueError, match="Outcome must be 0 or 1"):
         brier_score(0.5, 0.5)
+
+
+def test_brier_skill_score_supports_constant_and_per_game_references() -> None:
+    assert brier_skill_score([0.75, 0.25], iter([1, 0]), 0.5) == 0.75
+    assert brier_skill_score([0.75, 0.25], [1, 0], iter([0.75, 0.25])) == 0
+    assert brier_skill_score([1, 0], [1, 0], 0.5) == 1
+    assert brier_skill_score([0, 1], [1, 0], 0.5) == -3
+
+
+def test_brier_skill_score_rejects_undefined_or_unpaired_baselines() -> None:
+    with pytest.raises(ValueError, match="perfect reference"):
+        brier_skill_score([0.8], [1], 1.0)
+    with pytest.raises(ValueError, match="must match"):
+        brier_skill_score([0.8, 0.6], [1, 0], [0.5])
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        brier_skill_score([0.8], [1], float("nan"))
 
 
 def test_log_loss_single() -> None:
