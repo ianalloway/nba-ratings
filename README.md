@@ -115,6 +115,21 @@ Calibration bins include their lower boundary and exclude their upper boundary:
 with 10 bins, a prediction of `0.6` belongs in `[0.6, 0.7)`. A prediction of `1.0`
 belongs in the final bin. Empty bins are omitted from the returned records.
 
+### Playoff series forecasts
+
+Pass one team's win probabilities in schedule order, including every possible game.
+For a best-of-seven series using a 2–2–1–1–1 home schedule:
+
+```python
+from nba_edge import forecast_series
+
+series = forecast_series([0.62, 0.62, 0.48, 0.48, 0.62, 0.48, 0.62])
+print(series["win_probability"], series["expected_games"])
+print(series["length_probabilities"][7])  # chance the series reaches game seven
+```
+
+The calculation assumes independent games and ends each path when either team clinches.
+
 ### Rolling CLV
 
 Track whether your ticket prices beat the close — the market-aware cousin of

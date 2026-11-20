@@ -45,6 +45,7 @@ from nba_edge.rest import (
     haversine_miles,
     rest_spread_adjustment,
 )
+from nba_edge.series import SeriesForecast, forecast_series
 
 __all__ = [
     "DEFAULT_REST_COEFFS",
@@ -54,6 +55,7 @@ __all__ = [
     "RestAdjustmentCoeffs",
     "RollingClvSummary",
     "ScheduleGame",
+    "SeriesForecast",
     "american_to_decimal",
     "american_to_implied_prob",
     "brier_score",
@@ -68,6 +70,7 @@ __all__ = [
     "expected_margin",
     "expected_margin_with_rest",
     "fair_american_odds",
+    "forecast_series",
     "haversine_miles",
     "implied_prob_to_american",
     "implied_prob_to_decimal",
